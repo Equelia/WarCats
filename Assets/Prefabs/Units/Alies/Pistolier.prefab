@@ -48,7 +48,7 @@ CapsuleCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 0
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -97,7 +97,9 @@ MonoBehaviour:
   teamId: 0
   attackStoppingDistance: 5
   coverSearchRadius: 6
-  coverSeekDistance: 6
+  detectionRadius: 14
+  coverSeekDistance: 14
+  debugCover: 1
   muzzleFlashInstance: {fileID: 6334463624661268859}
 --- !u!1001 &1446645019413507392
 PrefabInstance:

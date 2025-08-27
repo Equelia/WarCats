@@ -1,75 +1,69 @@
-﻿using System.Collections;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using Helpers;
 using Units.Data;
-using Units.Logic;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace Units.Logic
 {
-	/// <summary>
-	/// Ranged pistol unit that uses UnitLogic state machine and NavMeshAgent.
-	/// </summary>
-	[RequireComponent(typeof(NavMeshAgent))]
-	public class PistolierLogic : UnitLogic
-	{
-		[Header("FX")]
-		[Tooltip("Assign the muzzle flash GameObject (child on the unit prefab). Keep it inactive in prefab.")]
-		public GameObject muzzleFlashInstance;
-		
-		private ReusableEffect _muzzleEffect;
+    /// <summary>
+    /// Ranged pistol unit that uses UnitLogic state machine and NavMeshAgent.
+    /// Plays muzzle flash from a reusable instance and uses UniTask for async attack.
+    /// </summary>
+    [RequireComponent(typeof(NavMeshAgent))]
+    public class PistolierLogic : UnitLogic
+    {
+        [Header("FX")]
+        [Tooltip("Assign the muzzle flash GameObject (child on the unit prefab). Keep it inactive in prefab.")]
+        public GameObject muzzleFlashInstance;
 
-		private PistolierData pistolierData => unitData as PistolierData;
+        private ReusableEffect _muzzleEffect;
+        private PistolierData pistolierData => unitData as PistolierData;
 
-		protected override void Awake()
-		{
-			base.Awake();
-			
-			if (pistolierData == null)
-				Debug.LogWarning($"{name}: assigned UnitData is not PistolierData (or is null).", this);
-			
-			// locate ReusableEffect on the assigned instance (or add it)
-			if (muzzleFlashInstance != null)
-			{
-				_muzzleEffect = muzzleFlashInstance.GetComponent<ReusableEffect>();
-				if (_muzzleEffect == null)
-				{
-					// If user assigned just a ParticleSystem object, add ReusableEffect automatically
-					_muzzleEffect = muzzleFlashInstance.AddComponent<ReusableEffect>();
-				}
+        protected override void Awake()
+        {
+            base.Awake();
 
-				// ensure instance is initially inactive so it doesn't play until requested
-				muzzleFlashInstance.SetActive(false);
-			}
-		}
+            if (pistolierData == null)
+                Debug.LogWarning($"{name}: assigned UnitData is not PistolierData (or is null).", this);
 
-		protected override IEnumerator PerformAttackCoroutine(Transform target)
-		{
-			// optional small delay to simulate fire time
-			yield return new WaitForSeconds(0.3f);
+            // locate ReusableEffect on the assigned instance (or add it)
+            if (muzzleFlashInstance != null)
+            {
+                _muzzleEffect = muzzleFlashInstance.GetComponent<ReusableEffect>();
+                if (_muzzleEffect == null)
+                {
+                    _muzzleEffect = muzzleFlashInstance.AddComponent<ReusableEffect>();
+                }
 
-			if (_muzzleEffect != null)
-			{
-				_muzzleEffect.Play();
-			}
+                // ensure instance is initially inactive so it doesn't play until requested
+                muzzleFlashInstance.SetActive(false);
+            }
+        }
 
-			if (target == null) yield break;
+        /// <summary>
+        /// Override to play muzzle flash before applying damage logic in base.PerformAttackAsync.
+        /// </summary>
+        protected override async UniTask PerformAttackAsync(Transform target, CancellationToken ct)
+        {
+            // play muzzle effect immediately (fire-and-forget handled by ReusableEffect)
+            if (_muzzleEffect != null)
+            {
+                _muzzleEffect.Play();
+            }
 
-			float roll = Random.value;
-			if (roll <= stats.accuracy)
-			{
-				var unit = target.GetComponent<UnitLogic>();
-				if (unit != null)
-				{
-					unit.ReceiveDamage(stats.damage);
-				}
-			}
-		}
+            // small delay so FX/animation feels synced - tune as needed (e.g. 0..200 ms)
+            await UniTask.DelayFrame(1, cancellationToken: ct); // one frame delay
 
-		public int GetSpawnCountForLevel()
-		{
-			if (pistolierData == null) return 1;
-			return pistolierData.GetSpawnCountForLevel(level);
-		}
-	}
+            // call base logic (damage calculation using vulnerability)
+            await base.PerformAttackAsync(target, ct);
+        }
+
+        public int GetSpawnCountForLevel()
+        {
+            if (pistolierData == null) return 1;
+            return pistolierData.GetSpawnCountForLevel(level);
+        }
+    }
 }

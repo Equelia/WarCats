@@ -1,74 +1,89 @@
-﻿using System.Collections;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Helpers
 {
     /// <summary>
-    /// Lightweight helper that plays ParticleSystem on the GameObject and disables it when done.
-    /// Designed to be attached to per-unit FX child (example: MuzzleFlash on unit prefab).
-    /// Usage: keep GameObject inactive in prefab (or particle PlayOnAwake = false).
-    /// Call Play() to show the effect (it will enable, play, wait until finished, then disable).
+    /// Lightweight reusable effect runner that plays a ParticleSystem on the GameObject and disables it when done.
+    /// Uses UniTask instead of coroutines.
+    /// Expectation: the effect GameObject is a child of a unit prefab and is initially inactive or has PlayOnAwake = false.
     /// </summary>
     [RequireComponent(typeof(ParticleSystem))]
     public class ReusableEffect : MonoBehaviour
     {
         ParticleSystem _ps;
-        Coroutine _runner;
+        CancellationTokenSource _cts;
 
         void Awake()
         {
             _ps = GetComponent<ParticleSystem>();
-            // ensure we start disabled when not used by code:
-            // leave GameObject inactive in prefab OR allow this to disable it on Awake
-            // we don't auto-disable here to not interfere if you want it active in editor.
+            // keep GameObject inactive in prefab OR ensure it doesn't play on awake
         }
 
         /// <summary>
-        /// Play the effect. If already playing, restarts it.
-        /// Safe to call frequently.
+        /// Play the effect. If already playing it restarts.
         /// </summary>
         public void Play()
         {
-            if (_runner != null)
+            // cancel previous watcher
+            if (_cts != null)
             {
-                StopCoroutine(_runner);
-                _runner = null;
+                _cts.Cancel();
+                _cts.Dispose();
+                _cts = null;
             }
 
-            // ensure GameObject active so particles are visible
             gameObject.SetActive(true);
-
-            // restart particle system
             _ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             _ps.Play();
 
-            _runner = StartCoroutine(WatchAndDisable());
+            _cts = new CancellationTokenSource();
+            WatchAndDisableAsync(_cts.Token).Forget();
         }
 
-        IEnumerator WatchAndDisable()
+        async UniTaskVoid WatchAndDisableAsync(CancellationToken ct)
         {
-            // Wait until particle system is fully done (including children/remaining lifetime)
-            while (_ps.IsAlive(true))
+            try
             {
-                yield return null;
+                // wait until particle system is no longer alive (children included)
+                while (!ct.IsCancellationRequested && _ps != null && _ps.IsAlive(true))
+                {
+                    await UniTask.Yield(ct);
+                }
+            }
+            catch (System.Exception)
+            {
+                // ignore
             }
 
-            _runner = null;
-            // disable after finished to hide and be ready for reuse
-            gameObject.SetActive(false);
+            if (!ct.IsCancellationRequested)
+            {
+                try
+                {
+                    gameObject.SetActive(false);
+                }
+                catch { }
+            }
         }
 
-        /// <summary>Optional: stop immediately and hide.</summary>
         public void StopAndHide()
         {
-            if (_runner != null)
+            if (_cts != null)
             {
-                StopCoroutine(_runner);
-                _runner = null;
+                _cts.Cancel();
+                _cts.Dispose();
+                _cts = null;
             }
-
-            _ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            if (_ps != null) _ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
             gameObject.SetActive(false);
+        }
+
+        void OnDestroy()
+        {
+            if (_cts != null) _cts.Cancel();
+            if (_cts != null) _cts.Dispose();
+            _cts = null;
         }
     }
 }

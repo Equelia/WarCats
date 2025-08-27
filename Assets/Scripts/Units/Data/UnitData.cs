@@ -19,8 +19,10 @@ namespace Units.Data
         public float attackRange = 5f;
         [Tooltip("Attack cooldown in seconds (lower = faster attacks).")]
         public float attackCooldown = 1f;
-        [Tooltip("Accuracy of each shot.")]
+        [Tooltip("Accuracy of each shot. (0..1)")]
         [Range(0f, 1f)] public float accuracy = 0.9f;
+        [Tooltip("Base vulnerability. NOTE: in this project higher vulnerability value means HARDER to hit (it's used as a protection factor). Range 0..1.")]
+        [Range(0f, 1f)] public float vulnerability = 0f;
         public int damage = 5;
         public int maxHealth = 20;
 
@@ -42,6 +44,7 @@ namespace Units.Data
             public int damageAdd;                 // add to base damage
             public int healthAdd;
             public float moveSpeedMultiplier;
+            public float vulnerabilityAdd;        // add to base vulnerability
         }
 
         /// <summary>
@@ -58,7 +61,8 @@ namespace Units.Data
                 maxHealth = maxHealth,
                 moveSpeed = moveSpeed,
                 spawnCost = spawnCost,
-                spawnCooldown = spawnCooldown
+                spawnCooldown = spawnCooldown,
+                vulnerability = vulnerability
             };
 
             if (level < 1) level = 1;
@@ -75,12 +79,14 @@ namespace Units.Data
                     stats.damage += mod.damageAdd;
                     stats.maxHealth += mod.healthAdd;
                     stats.moveSpeed *= (mod.moveSpeedMultiplier == 0f ? 1f : mod.moveSpeedMultiplier);
+                    stats.vulnerability += mod.vulnerabilityAdd;
                     break;
                 }
             }
 
             // clamp sensible ranges
             stats.accuracy = Mathf.Clamp01(stats.accuracy);
+            stats.vulnerability = Mathf.Clamp01(stats.vulnerability);
             if (stats.attackCooldown < 0.05f) stats.attackCooldown = 0.05f;
 
             return stats;
@@ -100,5 +106,6 @@ namespace Units.Data
         public float moveSpeed;
         public int spawnCost;
         public float spawnCooldown;
+        public float vulnerability; // 0..1, interpretation: higher -> harder to hit (adds protection)
     }
 }
