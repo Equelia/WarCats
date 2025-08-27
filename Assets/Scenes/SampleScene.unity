@@ -2780,6 +2780,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   protection: 0.1
+  occupant: {fileID: 0}
 --- !u!208 &672378062
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -3700,10 +3701,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eb4808d7a7343b0bb9e4802baa0bc8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aliePrefab: {fileID: 7394312270041580394, guid: c8e1b1bd6f2395347ab452a4265144f0, type: 3}
-  enemyPrefab: {fileID: 1193915632871279694, guid: 63b0000dd8b027c49be95ff45790710a, type: 3}
-  aliesSpawnPoint: {fileID: 1142694337}
+  allyPrefab: {fileID: 6093988759227092507, guid: c8e1b1bd6f2395347ab452a4265144f0, type: 3}
+  enemyPrefab: {fileID: 4915153358868269053, guid: 63b0000dd8b027c49be95ff45790710a, type: 3}
+  alliesSpawnPoint: {fileID: 1142694337}
   enemySpawnPoint: {fileID: 77540201}
+  unitsRoot: {fileID: 947366620}
 --- !u!4 &947366620
 Transform:
   m_ObjectHideFlags: 0
@@ -4790,6 +4792,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   protection: 0.1
+  occupant: {fileID: 0}
 --- !u!208 &1244866042
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -5840,6 +5843,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   protection: 0.1
+  occupant: {fileID: 0}
 --- !u!208 &1380994478
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -6721,6 +6725,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   protection: 0.1
+  occupant: {fileID: 0}
 --- !u!208 &1585890242
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -7414,6 +7419,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   protection: 0.1
+  occupant: {fileID: 0}
 --- !u!208 &1714412175
 NavMeshObstacle:
   m_ObjectHideFlags: 0

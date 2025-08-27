@@ -95,10 +95,9 @@ MonoBehaviour:
   unitData: {fileID: 11400000, guid: 5cc54a6e96156234fba43ccd7b1afd80, type: 2}
   level: 1
   teamId: 0
-  attackStoppingDistance: 5
   coverSearchRadius: 6
-  detectionRadius: 14
   coverSeekDistance: 14
+  coverExcludeAngleDeg: 100
   debugCover: 1
   muzzleFlashInstance: {fileID: 6334463624661268859}
 --- !u!1001 &1446645019413507392
@@ -508,13 +507,28 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 157586, guid: 4c33afaf0cca1d044b376da223687540, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6236374871319293268}
   m_SourcePrefab: {fileID: 100100000, guid: 4c33afaf0cca1d044b376da223687540, type: 3}
 --- !u!1 &6334463624661268859 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 157586, guid: 4c33afaf0cca1d044b376da223687540, type: 3}
   m_PrefabInstance: {fileID: 6334463624661376745}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6236374871319293268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6334463624661268859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5316926dccb84fcba7ffaabac76160fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &6334463624661461809 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 488920, guid: 4c33afaf0cca1d044b376da223687540, type: 3}

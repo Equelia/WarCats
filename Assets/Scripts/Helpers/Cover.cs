@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using Units.Logic; 
+using Units.Logic;
 
 namespace Helpers
 {
@@ -11,13 +11,11 @@ namespace Helpers
 	[DisallowMultipleComponent]
 	public class Cover : MonoBehaviour
 	{
-		[Tooltip("Protection added to unit vulnerability while standing behind this cover (0..1).")]
-		[Range(0f, 1f)]
+		[Tooltip("Protection added to unit vulnerability while standing behind this cover (0..1).")] [Range(0f, 1f)]
 		public float protection = 0.5f;
 
 		// current occupant of this cover (null when free)
-		[HideInInspector]
-		public UnitLogic occupant = null;
+		[HideInInspector] public UnitController occupant = null;
 
 		/// <summary>
 		/// Is the cover currently occupied by some unit?
@@ -29,7 +27,7 @@ namespace Helpers
 		/// Note: UnitLogic.OccupyCover already sets occupant directly — this method is available if you prefer
 		/// to request occupation from Cover side.
 		/// </summary>
-		public bool TryOccupy(UnitLogic u)
+		public bool TryOccupy(UnitController u)
 		{
 			if (occupant == null)
 			{
@@ -44,7 +42,7 @@ namespace Helpers
 		/// <summary>
 		/// Release occupant if it matches provided unit.
 		/// </summary>
-		public void Release(UnitLogic u)
+		public void Release(UnitController u)
 		{
 			if (occupant == u)
 				occupant = null;
