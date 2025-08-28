@@ -1,75 +1,77 @@
-﻿using System.Collections;
+﻿using Cysharp.Threading.Tasks;
 using Helpers;
 using Units.Data;
-using Units.Logic;
+using Units.Logic.Core;
+using Units.Logic.Services;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace Units.Logic
 {
-	/// <summary>
-	/// Ranged pistol unit that uses UnitLogic state machine and NavMeshAgent.
-	/// </summary>
-	[RequireComponent(typeof(NavMeshAgent))]
-	public class PistolierLogic : UnitLogic
-	{
-		[Header("FX")]
-		[Tooltip("Assign the muzzle flash GameObject (child on the unit prefab). Keep it inactive in prefab.")]
-		public GameObject muzzleFlashInstance;
-		
-		private ReusableEffect _muzzleEffect;
+    /// <summary>
+    /// Ranged pistol unit. Reuses the modular controller and injects FX hook for shots.
+    /// </summary>
+    [RequireComponent(typeof(NavMeshAgent))]
+    public class PistolierLogic : UnitController
+    {
+        [Header("FX")]
+        [Tooltip("Assign a muzzle flash GameObject (child on the unit prefab). It must have a ParticleSystem.")]
+        public GameObject muzzleFlashInstance;
 
-		private PistolierData pistolierData => unitData as PistolierData;
+        private PistolierData _pistolierData;
 
-		protected override void Awake()
-		{
-			base.Awake();
-			
-			if (pistolierData == null)
-				Debug.LogWarning($"{name}: assigned UnitData is not PistolierData (or is null).", this);
-			
-			// locate ReusableEffect on the assigned instance (or add it)
-			if (muzzleFlashInstance != null)
-			{
-				_muzzleEffect = muzzleFlashInstance.GetComponent<ReusableEffect>();
-				if (_muzzleEffect == null)
-				{
-					// If user assigned just a ParticleSystem object, add ReusableEffect automatically
-					_muzzleEffect = muzzleFlashInstance.AddComponent<ReusableEffect>();
-				}
+        protected override void Awake()
+        {
+            // Do NOT touch _muzzleEffect here; the combat service will build it.
+            base.Awake();
 
-				// ensure instance is initially inactive so it doesn't play until requested
-				muzzleFlashInstance.SetActive(false);
-			}
-		}
+            _pistolierData = Context.UnitData as PistolierData;
+            if (_pistolierData == null)
+                Debug.LogWarning($"{name}: assigned UnitData is not PistolierData (or is null).", this);
+        }
 
-		protected override IEnumerator PerformAttackCoroutine(Transform target)
-		{
-			// optional small delay to simulate fire time
-			yield return new WaitForSeconds(0.3f);
+        /// <summary>
+        /// Build the combat service and safely prepare the FX component here.
+        /// This runs during base.Awake(), so we must not rely on fields set after base.Awake().
+        /// </summary>
+        protected override ICombatService CreateCombatService()
+        {
+            ReusableEffect fx = null;
 
-			if (_muzzleEffect != null)
-			{
-				_muzzleEffect.Play();
-			}
+            if (muzzleFlashInstance != null)
+            {
+                // Ensure the FX component exists (and a ParticleSystem is present due to RequireComponent)
+                fx = muzzleFlashInstance.GetComponent<ReusableEffect>();
+                if (fx == null)
+                    fx = muzzleFlashInstance.AddComponent<ReusableEffect>();
 
-			if (target == null) yield break;
+            }
+            else
+            {
+                Debug.LogWarning($"{name}: muzzleFlashInstance is not assigned. No muzzle FX will play.", this);
+            }
 
-			float roll = Random.value;
-			if (roll <= stats.accuracy)
-			{
-				var unit = target.GetComponent<UnitLogic>();
-				if (unit != null)
-				{
-					unit.ReceiveDamage(stats.damage);
-				}
-			}
-		}
+            return new PistolCombatService(fx);
+        }
 
-		public int GetSpawnCountForLevel()
-		{
-			if (pistolierData == null) return 1;
-			return pistolierData.GetSpawnCountForLevel(level);
-		}
-	}
+        public int GetSpawnCountForLevel()
+        {
+            if (_pistolierData == null) return 1;
+            return _pistolierData.GetSpawnCountForLevel(Context.Level);
+        }
+
+        /// <summary>
+        /// Custom combat service that plays muzzle flash right when the shot triggers.
+        /// </summary>
+        private sealed class PistolCombatService : CombatService
+        {
+            private readonly ReusableEffect _fx;
+            public PistolCombatService(ReusableEffect fx) => _fx = fx;
+
+            protected override void OnBeforeAttackFx(UnitContext ctx)
+            {
+                _fx?.Play();
+            }
+        }
+    }
 }

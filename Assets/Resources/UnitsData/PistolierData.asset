@@ -15,9 +15,10 @@ MonoBehaviour:
   unitName: Pistolier
   spawnCost: 10
   spawnCooldown: 5
-  attackRange: 5
+  attackRange: 10
   attackCooldown: 1
   accuracy: 0.5
+  vulnerability: 0.05
   damage: 5
   maxHealth: 35
   moveSpeed: 1
