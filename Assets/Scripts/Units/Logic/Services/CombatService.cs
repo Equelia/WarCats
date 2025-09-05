@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿// CombatService.cs (замени на эту версию)
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Units.Logic.Core;
 using UnityEngine;
@@ -7,8 +8,11 @@ namespace Units.Logic.Services
 {
 	public class CombatService : ICombatService
 	{ 
-		/// <summary>Hook for subclasses (e.g., pistol muzzle flash).</summary>
+		/// <summary>FX hook: called right when animation tells "shot fired".</summary>
 		protected virtual void OnBeforeAttackFx(UnitContext ctx) { }
+
+		/// <summary>FX hook: called after gameplay decided hit/miss.</summary>
+		protected virtual void OnShotResolvedFx(UnitContext ctx, Transform target, bool didHit) { }
 
 		public void TryAttack(UnitContext ctx)
 		{
@@ -23,7 +27,7 @@ namespace Units.Logic.Services
 
 		public virtual async UniTask PerformAttackAsync(UnitContext ctx, Transform target, CancellationToken ct)
 		{
-			OnBeforeAttackFx(ctx); // FX hook
+			OnBeforeAttackFx(ctx); 
 			await UniTask.Yield(ct);
 
 			if (target == null) return;
@@ -32,12 +36,12 @@ namespace Units.Logic.Services
 			float targetVul = targetLogic != null ? targetLogic.Context.GetEffectiveVulnerability() : 0f;
 
 			float finalHitChance = ctx.Stats.accuracy * (1f - Mathf.Clamp01(targetVul));
-			float roll = Random.value;
-			if (roll <= finalHitChance)
-			{
-				if (targetLogic != null)
-					targetLogic.ReceiveDamage(ctx.Stats.damage);
-			}
+			bool didHit = Random.value <= finalHitChance;
+
+			if (didHit && targetLogic != null)
+				targetLogic.ReceiveDamage(ctx.Stats.damage);
+
+			OnShotResolvedFx(ctx, target, didHit);
 		}
 	}
 }
