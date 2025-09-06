@@ -3964,6 +3964,8 @@ MonoBehaviour:
   - {fileID: 1498879833}
   - {fileID: 1943365991}
   spawner: {fileID: 947366619}
+  sharedSpawnAreas:
+  - {fileID: 984964928}
   btnUpgradeLevel: {fileID: 362328371}
   btnIncreaseCapacity: {fileID: 2026280286}
   btnExchangePoint: {fileID: 1509925930}
@@ -22773,6 +22775,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5368194436649754404, guid: 758401b031cd55746b179173f5c0383b, type: 3}
+      propertyPath: 'spawnAreas.Array.data[0]'
+      value: 
+      objectReference: {fileID: 984964928}
     - target: {fileID: 6026698633745447299, guid: 758401b031cd55746b179173f5c0383b, type: 3}
       propertyPath: spawnAreas.Array.size
       value: 1

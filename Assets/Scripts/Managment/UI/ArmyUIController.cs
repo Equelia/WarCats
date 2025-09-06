@@ -18,7 +18,6 @@ public class ArmyUIController : MonoBehaviour
     [SerializeField] private TMP_Text levelText;
     [SerializeField] private TMP_Text armyUpgradeProgressText;
 
-
     [Header("XP UI")]
     [SerializeField] private XpBarUI xpBar;
 
@@ -31,7 +30,10 @@ public class ArmyUIController : MonoBehaviour
 
     [Header("Spawn Routing")]
     [SerializeField] private UnitSpawner spawner;
-    
+
+    [Tooltip("Optional shared spawn areas for all summon slots (can be left empty if each controller has its own).")]
+    [SerializeField] private SpawnAreaBase[] sharedSpawnAreas;
+
     [Header("Economy Buttons")]
     [SerializeField] private Button btnUpgradeLevel;
     [SerializeField] private Button btnIncreaseCapacity;
@@ -54,56 +56,33 @@ public class ArmyUIController : MonoBehaviour
             armyEconomy.OnXpLevelChanged += OnXpLevelChanged;
             armyEconomy.OnXpChanged += OnXpChanged;
             armyEconomy.OnSlotsChanged += OnSlotsChanged;
-            
+            armyEconomy.OnArmyUpgradeProgressChanged += OnArmyUpgradeProgressChanged;
         }
 
-        // Setup top texts
-        OnCreditsChanged(armyEconomy.State.credits);
-        OnPointsChanged(armyEconomy.State.points);
-        OnXpLevelChanged(armyEconomy.State.xpLevel);
-        OnXpChanged(armyEconomy.State.XpFill);
-        OnSlotsChanged(armyEconomy.State.occupiedSlots, armyEconomy.State.maxSlots);
-        
+        // Setup top texts (initial)
+        if (armyEconomy)
+        {
+            OnCreditsChanged(armyEconomy.State.credits);
+            OnPointsChanged(armyEconomy.State.points);
+            OnXpLevelChanged(armyEconomy.State.xpLevel);
+            OnXpChanged(armyEconomy.State.XpFill);
+            OnSlotsChanged(armyEconomy.State.occupiedSlots, armyEconomy.State.maxSlots);
+            OnArmyUpgradeProgressChanged(
+                armyEconomy.State.armyUpgradeProgress,
+                armyEconomy.State.armyUpgradeStepsRequired
+            );
+        }
+
         if (btnUpgradeLevel) btnUpgradeLevel.onClick.AddListener(OnClickUpgradeLevel);
         if (btnIncreaseCapacity) btnIncreaseCapacity.onClick.AddListener(OnClickIncreaseCap);
         if (btnExchangePoint) btnExchangePoint.onClick.AddListener(OnClickExchangePoint);
-        if(armyEconomy) armyEconomy.OnArmyUpgradeProgressChanged += OnArmyUpgradeProgressChanged;
-        
-        OnArmyUpgradeProgressChanged(
-            armyEconomy.State.armyUpgradeProgress,
-            armyEconomy.State.armyUpgradeStepsRequired
-        );
 
-        // Setup summon buttons from deck
-        for (int i = 0; i < summonButtons.Length; i++)
-        {
-            var btn = summonButtons[i];
-            if (!btn) continue;
+        // Bind upgrade view once
+        var view = btnUpgradeLevel ? btnUpgradeLevel.GetComponent<ArmyUpgradeButtonView>() : null;
+        if (view && armyEconomy) view.Bind(armyEconomy);
 
-            bool hasEntry =
-                deck && deck.entries != null &&
-                i < deck.visibleSlots &&
-                i < deck.entries.Length &&
-                deck.entries[i].unitPrefab != null;
-
-            if (hasEntry)
-            {
-                btn.Configure(
-                    deck.entries[i],
-                    armyEconomy, // IArmyEconomy для игрока
-                    spawner, // UnitSpawner из сцены
-                    explicitSpawnPoint: null,
-                    forceTeamId: 0 // игрок
-                );
-            }
-            else
-            {
-                btn.Clear();
-            }
-            
-            var view = btnUpgradeLevel ? btnUpgradeLevel.GetComponent<ArmyUpgradeButtonView>() : null;
-            if (view) view.Bind(armyEconomy);
-        }
+        // Setup summon buttons via controller split
+        SetupSummonSlots();
     }
 
     private void OnDestroy()
@@ -150,6 +129,12 @@ public class ArmyUIController : MonoBehaviour
         lampRow?.SetState(occupied, max);
     }
 
+    private void OnArmyUpgradeProgressChanged(int current, int required)
+    {
+        if (armyUpgradeProgressText)
+            armyUpgradeProgressText.text = $"{current}\n---\n{required}";
+    }
+
     // -------- UI -> Economy ----------
 
     private void OnClickUpgradeLevel()
@@ -166,10 +151,52 @@ public class ArmyUIController : MonoBehaviour
     {
         armyEconomy?.TryExchangePointForCredits(exchangeCreditsPerPoint);
     }
-    
-    private void OnArmyUpgradeProgressChanged(int current, int required)
+
+    // -------- Summon slots wiring ----------
+
+    private void SetupSummonSlots()
     {
-        if (armyUpgradeProgressText)
-            armyUpgradeProgressText.text = $"{current}\n---\n{required}";
+        for (int i = 0; i < summonButtons.Length; i++)
+        {
+            var btn = summonButtons[i];
+            if (!btn) continue;
+
+            bool hasEntry =
+                deck && deck.entries != null &&
+                i < deck.visibleSlots &&
+                i < deck.entries.Length &&
+                deck.entries[i].unitPrefab != null;
+
+            if (!hasEntry)
+            {
+                // отвяжем контроллер, если остался от предыдущей деки
+                var oldCtrl = btn.GetComponent<UnitSummonController>();
+                if (oldCtrl) Destroy(oldCtrl);
+
+                // показать как пустой слот
+                btn.ShowEmptySlot();
+                continue;
+            }
+
+            // контроллер на объекте с кнопкой
+            var controller = btn.GetComponent<UnitSummonController>();
+            if (!controller) controller = btn.gameObject.AddComponent<UnitSummonController>();
+
+            // конфиг контроллера (teamId=0 = игрок)
+            controller.Configure(
+                entry: deck.entries[i],
+                army: armyEconomy,
+                spawner: spawner,
+                baseProvider: FindObjectOfType<MonoBehaviour>() as ITeamBaseProvider, // если есть провайдер
+                explicitSpawnPoint: null,
+                areas: sharedSpawnAreas,
+                forceTeamId: 0,
+                forceLevel: null,
+                forceSpawnRadius: null
+            );
+
+            // привязать UI к контроллеру
+            btn.BindToController(controller);
+        }
     }
 }

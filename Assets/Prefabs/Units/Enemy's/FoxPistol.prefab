@@ -108,9 +108,9 @@ MonoBehaviour:
   muzzleSmokeInstance: {fileID: 3673560287068085669}
   spawnVfxPrefab: {fileID: 8095316915271095879, guid: 77d8018e600584e4ab25dd661fe128f3, type: 3}
   firePoint: {fileID: 4784725399967330365}
-  missRadius: 0.6
+  missRadius: 1
   targetOffset: {x: 0, y: 1.2, z: 0}
-  bulletSpeed: 45
+  bulletSpeed: 65
   hitMask:
     serializedVersion: 2
     m_Bits: 337
