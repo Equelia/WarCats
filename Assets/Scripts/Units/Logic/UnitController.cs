@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
+using Units.Data;
 using Units.Logic.Core;
 using Units.Logic.Fsm;
 using Units.Logic.Services;
@@ -39,6 +40,8 @@ namespace Units.Logic
         // Public accessors
         public int TeamId => teamId;
         public UnitContext Context => _ctx;
+        public UnitData UnitDataAsset => unitData;
+
 
         // Core
         protected UnitContext _ctx;
@@ -117,9 +120,7 @@ namespace Units.Logic
                 if (explicitEnemyBase != null)
                     _ctx.EnemyBase = explicitEnemyBase;
                 else if (baseProvider != null)
-                    _ctx.EnemyBase = baseProvider.GetOpposingBaseTransform(teamId);
-            }
-            // If called before Awake (rare with these patterns), Awake will still resolve EnemyBase via baseProvider.
+                    _ctx.EnemyBase = explicitEnemyBase ?? (baseProvider != null  ? baseProvider.GetOpposingBaseTransform(teamId) : null);            }
         }
 
         protected virtual ICombatService CreateCombatService() => new CombatService();
@@ -182,9 +183,13 @@ namespace Units.Logic
         /// </summary>
         public virtual void SetLevel(int newLevel)
         {
-            _ctx.Level = Mathf.Clamp(newLevel, 1, 3);
+            // keep serialized field in sync so Inspector shows the runtime value
+            level = Mathf.Clamp(newLevel, 1, 3);
+
+            _ctx.Level = level;
             _ctx.Stats = _ctx.UnitData.GetStatsForLevel(_ctx.Level);
             _ctx.CurrentHealth = _ctx.Stats.maxHealth;
+
             if (_ctx.Agent != null)
             {
                 _ctx.Agent.speed = _ctx.Stats.moveSpeed;

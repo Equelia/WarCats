@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 3718765245483706668}
   - component: {fileID: 3987387045473545184}
   - component: {fileID: 6093988759227092507}
+  - component: {fileID: -7793571022646903483}
+  - component: {fileID: -2902039701871179196}
   m_Layer: 7
   m_Name: Pistolier
   m_TagString: Unit
@@ -115,6 +117,30 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 128
+--- !u!114 &-7793571022646903483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7394312270041580394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c29140c6ad24dc5982ed9ae3a9cb765, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-2902039701871179196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7394312270041580394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2db7ceaa783470abe5375861e7cf4c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8478909822425927627
 GameObject:
   m_ObjectHideFlags: 0

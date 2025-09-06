@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8633249995390626866}
   - component: {fileID: 4915153358868269053}
   - component: {fileID: 897653879724695481}
+  - component: {fileID: 2929632396075599113}
   m_Layer: 7
   m_Name: FoxPistol
   m_TagString: Unit
@@ -126,6 +127,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a2db7ceaa783470abe5375861e7cf4c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2929632396075599113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1193915632871279694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c29140c6ad24dc5982ed9ae3a9cb765, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6665245222818388235
@@ -541,6 +554,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7248160338607628613, guid: 287b2868218720b49856a8c7b1340d09, type: 3}
+      propertyPath: playOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8626219244651027679, guid: 287b2868218720b49856a8c7b1340d09, type: 3}
       propertyPath: m_Name
       value: vfxMuzzleFlash
@@ -611,6 +628,10 @@ PrefabInstance:
     - target: {fileID: 6095962658649959245, guid: 83d4ba0812b50cd4c842620f72b945b4, type: 3}
       propertyPath: m_Name
       value: vfxMuzzleSmoke
+      objectReference: {fileID: 0}
+    - target: {fileID: 7817756716502021394, guid: 83d4ba0812b50cd4c842620f72b945b4, type: 3}
+      propertyPath: playOnAwake
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -17,6 +17,8 @@ public interface IArmyEconomy
     event Action<int,int> OnSlotsChanged; // (occupied, max)
     event Action<int> OnLevelChanged;
     event Action<float> OnXpChanged;      // 0..1
+    event Action<int, int> OnArmyUpgradeProgressChanged; 
+
 
     void AddCredits(int amount);
     bool TrySpendCredits(int amount);
@@ -80,6 +82,8 @@ public class ArmyEconomy : MonoBehaviour, IArmyEconomy
     public event Action<int,int> OnSlotsChanged;
     public event Action<int> OnLevelChanged;
     public event Action<float> OnXpChanged;
+    public event Action<int> OnXpLevelChanged;      
+    public event Action<int,int> OnArmyUpgradeProgressChanged;
 
     private bool _runningIncome;
 
@@ -113,7 +117,7 @@ public class ArmyEconomy : MonoBehaviour, IArmyEconomy
     private void Start()
     {
         // Recompute xpToLevel based on config + current level
-        State.xpToLevel = Mathf.Max(1, baseXpToLevel + (State.level - 1) * xpGrowthPerLevel);
+        State.xpToLevel = Mathf.Max(1, baseXpToLevel + (State.xpLevel  - 1) * xpGrowthPerLevel);
         RunIncomeLoop().Forget();
         RaiseAll();
     }
@@ -180,16 +184,16 @@ public class ArmyEconomy : MonoBehaviour, IArmyEconomy
         if (xp <= 0) return;
         State.currentXp += xp;
 
-        // Level up loop if we overflow XP multiple times
         while (State.currentXp >= State.xpToLevel)
         {
             State.currentXp -= State.xpToLevel;
-            State.level++;
-            OnLevelChanged?.Invoke(State.level);
-            AddPoints(pointsPerLevelUp); // award points
 
-            // Increase requirement for next level
-            State.xpToLevel = Mathf.Max(1, baseXpToLevel + (State.level - 1) * xpGrowthPerLevel);
+            State.xpLevel++;                      
+            OnXpLevelChanged?.Invoke(State.xpLevel);  
+            
+            AddPoints(pointsPerLevelUp);           
+
+            State.xpToLevel = Mathf.Max(1, baseXpToLevel + (State.xpLevel - 1) * xpGrowthPerLevel);
         }
 
         OnXpChanged?.Invoke(State.XpFill);
@@ -198,16 +202,36 @@ public class ArmyEconomy : MonoBehaviour, IArmyEconomy
 
     public bool TryUpgradeArmyLevel()
     {
-        // Example: cost = 1 point per level
         const int cost = 1;
         if (!TrySpendPoints(cost)) return false;
 
         State.level++;
         OnLevelChanged?.Invoke(State.level);
+        
+        OnStateChanged?.Invoke();
+        return true;
+    }
+    
+    
+    public bool TryUpgradeArmyLevelStep()
+    {
+        if (State.points <= 0) return false;
 
-        // Recompute XP required (carry current XP as is)
-        State.xpToLevel = Mathf.Max(1, baseXpToLevel + (State.level - 1) * xpGrowthPerLevel);
-        OnXpChanged?.Invoke(State.XpFill);
+        State.points--;
+        State.armyUpgradeProgress++;
+
+        OnPointsChanged?.Invoke(State.points);
+        OnArmyUpgradeProgressChanged?.Invoke(State.armyUpgradeProgress, State.armyUpgradeStepsRequired);
+
+        if (State.armyUpgradeProgress >= State.armyUpgradeStepsRequired)
+        {
+            State.armyUpgradeProgress = 0;
+            State.level++;                        
+            OnLevelChanged?.Invoke(State.level);
+            
+            OnArmyUpgradeProgressChanged?.Invoke(State.armyUpgradeProgress, State.armyUpgradeStepsRequired);
+
+        }
         OnStateChanged?.Invoke();
         return true;
     }
@@ -234,6 +258,9 @@ public class ArmyEconomy : MonoBehaviour, IArmyEconomy
     {
         if (State.occupiedSlots >= State.maxSlots) return false;
         State.occupiedSlots++;
+        
+        Debug.LogWarning($"[ArmyEconomy] ReserveSlot caller:\n{new System.Diagnostics.StackTrace(1, true)}");
+        
         OnSlotsChanged?.Invoke(State.occupiedSlots, State.maxSlots);
         OnStateChanged?.Invoke();
         return true;
@@ -252,7 +279,10 @@ public class ArmyEconomy : MonoBehaviour, IArmyEconomy
         OnPointsChanged?.Invoke(State.points);
         OnLevelChanged?.Invoke(State.level);
         OnSlotsChanged?.Invoke(State.occupiedSlots, State.maxSlots);
+        OnXpLevelChanged?.Invoke(State.xpLevel); 
         OnXpChanged?.Invoke(State.XpFill);
+        OnArmyUpgradeProgressChanged?.Invoke(State.armyUpgradeProgress, State.armyUpgradeStepsRequired);
         OnStateChanged?.Invoke();
     }
+
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+[DefaultExecutionOrder(-200)]
 public class ArmyDirectory : MonoBehaviour
 {
 	private static ArmyDirectory _instance;

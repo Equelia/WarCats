@@ -1,43 +1,45 @@
 ﻿using UnityEngine;
 using Units.Logic;
+using Zenject;
 
 [RequireComponent(typeof(UnitController))]
 public class UnitLevelFollower : MonoBehaviour
 {
-	private UnitController _uc;
+	private UnitController _unit;
 	private IArmyEconomy _army;
 
 	private void Awake()
 	{
-		_uc = GetComponent<UnitController>();
+		_unit = GetComponent<UnitController>();
 	}
 
 	private void Start()
 	{
-		// Find army by this unit's team
-		_army = ArmyDirectory.Get(_uc.TeamId);
 		if (_army == null)
 		{
-			Debug.LogWarning($"{name}: Army not found for team {_uc.TeamId}. Level won't auto-sync.");
+			Debug.LogWarning($"{name}: Army not found for team {_unit.TeamId}. Level won't auto-sync.");
 			return;
 		}
 
-		// Set initial level to army level
-		var lvl = Mathf.Max(1, _army.State.level);
-		_uc.SetLevel(lvl);
+		_unit.SetLevel(Mathf.Max(1, _army.State.level));
 
-		// Subscribe to future level changes
-		_army.OnLevelChanged += HandleArmyLevelChanged;
+		_army.OnLevelChanged += HandleLevelChanged;
 	}
 
 	private void OnDestroy()
 	{
 		if (_army != null)
-			_army.OnLevelChanged -= HandleArmyLevelChanged;
+			_army.OnLevelChanged -= HandleLevelChanged;
 	}
 
-	private void HandleArmyLevelChanged(int newLevel)
+	private void HandleLevelChanged(int newLevel)
 	{
-		_uc.SetLevel(Mathf.Max(1, newLevel));
+		Debug.Log("Set level to unit" + newLevel);
+		_unit.SetLevel(Mathf.Max(1, newLevel));
+	}
+
+	public void BindArmy(int teamId)
+	{
+		_army = ArmyDirectory.Get(teamId);
 	}
 }

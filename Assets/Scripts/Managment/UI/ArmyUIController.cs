@@ -16,6 +16,8 @@ public class ArmyUIController : MonoBehaviour
     [SerializeField] private TMP_Text creditsText;
     [SerializeField] private TMP_Text pointsText;
     [SerializeField] private TMP_Text levelText;
+    [SerializeField] private TMP_Text armyUpgradeProgressText;
+
 
     [Header("XP UI")]
     [SerializeField] private XpBarUI xpBar;
@@ -49,21 +51,28 @@ public class ArmyUIController : MonoBehaviour
         {
             armyEconomy.OnCreditsChanged += OnCreditsChanged;
             armyEconomy.OnPointsChanged += OnPointsChanged;
-            armyEconomy.OnLevelChanged += OnLevelChanged;
+            armyEconomy.OnXpLevelChanged += OnXpLevelChanged;
             armyEconomy.OnXpChanged += OnXpChanged;
             armyEconomy.OnSlotsChanged += OnSlotsChanged;
+            
         }
 
         // Setup top texts
         OnCreditsChanged(armyEconomy.State.credits);
         OnPointsChanged(armyEconomy.State.points);
-        OnLevelChanged(armyEconomy.State.level);
+        OnXpLevelChanged(armyEconomy.State.xpLevel);
         OnXpChanged(armyEconomy.State.XpFill);
         OnSlotsChanged(armyEconomy.State.occupiedSlots, armyEconomy.State.maxSlots);
         
         if (btnUpgradeLevel) btnUpgradeLevel.onClick.AddListener(OnClickUpgradeLevel);
         if (btnIncreaseCapacity) btnIncreaseCapacity.onClick.AddListener(OnClickIncreaseCap);
         if (btnExchangePoint) btnExchangePoint.onClick.AddListener(OnClickExchangePoint);
+        if(armyEconomy) armyEconomy.OnArmyUpgradeProgressChanged += OnArmyUpgradeProgressChanged;
+        
+        OnArmyUpgradeProgressChanged(
+            armyEconomy.State.armyUpgradeProgress,
+            armyEconomy.State.armyUpgradeStepsRequired
+        );
 
         // Setup summon buttons from deck
         for (int i = 0; i < summonButtons.Length; i++)
@@ -91,6 +100,9 @@ public class ArmyUIController : MonoBehaviour
             {
                 btn.Clear();
             }
+            
+            var view = btnUpgradeLevel ? btnUpgradeLevel.GetComponent<ArmyUpgradeButtonView>() : null;
+            if (view) view.Bind(armyEconomy);
         }
     }
 
@@ -100,9 +112,10 @@ public class ArmyUIController : MonoBehaviour
         {
             armyEconomy.OnCreditsChanged -= OnCreditsChanged;
             armyEconomy.OnPointsChanged -= OnPointsChanged;
-            armyEconomy.OnLevelChanged -= OnLevelChanged;
+            armyEconomy.OnXpLevelChanged -= OnXpLevelChanged;
             armyEconomy.OnXpChanged -= OnXpChanged;
             armyEconomy.OnSlotsChanged -= OnSlotsChanged;
+            armyEconomy.OnArmyUpgradeProgressChanged -= OnArmyUpgradeProgressChanged;
         }
 
         if (btnUpgradeLevel) btnUpgradeLevel.onClick.RemoveListener(OnClickUpgradeLevel);
@@ -122,9 +135,9 @@ public class ArmyUIController : MonoBehaviour
         if (pointsText) pointsText.text = value.ToString();
     }
 
-    private void OnLevelChanged(int lvl)
+    private void OnXpLevelChanged(int xpLvl)
     {
-        if (levelText) levelText.text = lvl.ToString();
+        if (levelText) levelText.text = xpLvl.ToString();
     }
 
     private void OnXpChanged(float fill01)
@@ -141,7 +154,7 @@ public class ArmyUIController : MonoBehaviour
 
     private void OnClickUpgradeLevel()
     {
-        armyEconomy?.TryUpgradeArmyLevel();
+        armyEconomy?.TryUpgradeArmyLevelStep();
     }
 
     private void OnClickIncreaseCap()
@@ -152,5 +165,11 @@ public class ArmyUIController : MonoBehaviour
     private void OnClickExchangePoint()
     {
         armyEconomy?.TryExchangePointForCredits(exchangeCreditsPerPoint);
+    }
+    
+    private void OnArmyUpgradeProgressChanged(int current, int required)
+    {
+        if (armyUpgradeProgressText)
+            armyUpgradeProgressText.text = $"{current}\n---\n{required}";
     }
 }
