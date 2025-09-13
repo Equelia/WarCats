@@ -21,41 +21,35 @@ public class UnitSummonController : MonoBehaviour
     [Tooltip("Random spawn radius near base if spawnPoint/areas are not set.")]
     public float spawnRadius = 4f;
 
-    // Injectables
-    private UnitDeckSO.Entry _entry;
+    // Injectables / data
+    private UnitController _prefab;   // передаём напрямую префаб UnitController
     private IArmyEconomy _army;
     private UnitSpawner _spawner;
     private ITeamBaseProvider _baseProvider;
-
-    // Data
     private UnitData _unitData;
 
-    // Cost
+    // Cost / stock
     public int SpawnCost { get; private set; }
-
-    // Stock state
     public bool HasStockLimit { get; private set; }
     public UnitData.StockMode StockMode { get; private set; }
     public int StockCurrent { get; private set; }
     public int StockMax { get; private set; }
 
-    // BIG refill (LimitedWithRecharge)
     public bool IsRefillingToMax { get; private set; }
     private float _refillCooldownSec;
 
     // Events for UI
-    public event Action<int, int> OnStockChanged;           // (current, max)
-    public event Action<bool> OnRefillActiveChanged;        // true when refill running
-    public event Action<float> OnRefillProgress;            // 1..0 fill (mask)
+    public event Action<int, int> OnStockChanged;    // (current, max)
+    public event Action<bool> OnRefillActiveChanged; // true when refill running
+    public event Action<float> OnRefillProgress;     // 1..0 fill (mask)
 
-    // Helpers
-    [Inject(Optional = true)] private DiContainer _container; // for safety (not required)
+    [Inject(Optional = true)] private DiContainer _container;
     private bool _configured;
 
     // -------------------- Public API --------------------
 
     public void Configure(
-        UnitDeckSO.Entry entry,
+        UnitController prefab,
         IArmyEconomy army,
         UnitSpawner spawner,
         ITeamBaseProvider baseProvider = null,
@@ -65,34 +59,32 @@ public class UnitSummonController : MonoBehaviour
         int? forceLevel = null,
         float? forceSpawnRadius = null)
     {
-        _entry        = entry;
+        _prefab       = prefab;
         _army         = army;
         _spawner      = spawner;
         _baseProvider = baseProvider ?? _baseProvider;
 
-        if (explicitSpawnPoint) spawnPoint = explicitSpawnPoint;
-        if (areas != null)      spawnAreas = areas;
-        if (forceTeamId.HasValue) teamId = forceTeamId.Value;
+        if (explicitSpawnPoint)   spawnPoint = explicitSpawnPoint;
+        if (areas != null)        spawnAreas = areas;
+        if (forceTeamId.HasValue) teamId     = forceTeamId.Value;
         if (forceLevel.HasValue)  levelOverride = forceLevel.Value;
         if (forceSpawnRadius.HasValue) spawnRadius = forceSpawnRadius.Value;
 
-        var prefabGo = _entry.unitPrefab;
-        if (prefabGo == null || _army == null || _spawner == null)
+        if (_prefab == null || _army == null || _spawner == null)
         {
             _configured = false;
             return;
         }
 
-        var uc = prefabGo.GetComponent<UnitController>();
+        var uc = _prefab.GetComponent<UnitController>();
         if (uc == null)
         {
             _configured = false;
             return;
         }
 
-        _unitData = uc.GetType()
-            .GetField("unitData", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            ?.GetValue(uc) as UnitData;
+        // Берём данные из публичного геттера
+        _unitData = uc.UnitDataAsset;
 
         if (_unitData == null)
         {
@@ -110,26 +102,26 @@ public class UnitSummonController : MonoBehaviour
         switch (StockMode)
         {
             case UnitData.StockMode.Unlimited:
-                HasStockLimit   = false;
-                StockCurrent    = int.MaxValue;
-                StockMax        = int.MaxValue;
+                HasStockLimit      = false;
+                StockCurrent       = int.MaxValue;
+                StockMax           = int.MaxValue;
                 _refillCooldownSec = 0f;
                 IsRefillingToMax   = false;
                 break;
 
             case UnitData.StockMode.LimitedNoRecharge:
-                HasStockLimit   = true;
-                StockCurrent    = Mathf.Max(0, _unitData.startingStock);
-                StockMax        = Mathf.Max(0, _unitData.maxStock);
+                HasStockLimit      = true;
+                StockCurrent       = Mathf.Max(0, _unitData.startingStock);
+                StockMax           = Mathf.Max(0, _unitData.maxStock);
                 _refillCooldownSec = 0f;
                 IsRefillingToMax   = false;
                 break;
 
             case UnitData.StockMode.LimitedWithRecharge:
-                HasStockLimit   = true;
-                StockCurrent    = Mathf.Max(0, _unitData.startingStock);
-                StockMax        = Mathf.Max(StockCurrent, _unitData.maxStock);
-                _refillCooldownSec = Mathf.Max(0.01f, _unitData.rechargeCooldown); 
+                HasStockLimit      = true;
+                StockCurrent       = Mathf.Max(0, _unitData.startingStock);
+                StockMax           = Mathf.Max(StockCurrent, _unitData.maxStock);
+                _refillCooldownSec = Mathf.Max(0.01f, _unitData.rechargeCooldown);
                 IsRefillingToMax   = false;
 
                 if (StockCurrent <= 0)
@@ -146,12 +138,12 @@ public class UnitSummonController : MonoBehaviour
         (!HasStockLimit || StockCurrent > 0) &&
         !(StockMode == UnitData.StockMode.LimitedWithRecharge && IsRefillingToMax);
 
-    /// <summary>Try to summon one unit/squad. Handles slots, credits, stock, pose, spawn.</summary>
+    /// <summary>Try to summon one unit or a group. Handles slots, credits, stock, pose, spawn.</summary>
     public bool TrySummon()
     {
         if (!CanSummon) return false;
 
-        // 1) Reserve slot (ONLY here)
+        // 1) Reserve slot
         if (!_army.TryReserveSlot()) return false;
 
         // 2) Credits
@@ -171,7 +163,6 @@ public class UnitSummonController : MonoBehaviour
         // 4) Pose
         if (!TryComputeSpawnPose(out var pos, out var rot))
         {
-            // rollback
             if (HasStockLimit) { StockCurrent++; RaiseStock(); }
             _army.AddCredits(SpawnCost);
             _army.ReleaseSlot();
@@ -179,39 +170,94 @@ public class UnitSummonController : MonoBehaviour
             return false;
         }
 
-        // 5) Spawn (spawner must NOT reserve slot): upstreamAlreadyReserved = true
+        // 5) Spawn
         int levelToUse = Mathf.Max(1, levelOverride > 0 ? levelOverride : _army.State.level);
-        var unit = _spawner.SpawnUnitAt(
-            teamId: teamId,
-            level: levelToUse,
-            position: pos,
-            rotation: rot,
-            prefab: _entry.unitPrefab,
-            explicitEnemyBase: null,
-            upstreamAlreadyReserved: true
-        );
+        int spawnCount = GetSpawnCountForLevelFromData(levelToUse);
 
-        if (!unit)
+        // одиночный спавн (как раньше)
+        if (spawnCount <= 1)
         {
-            // rollback
-            if (HasStockLimit) { StockCurrent++; RaiseStock(); }
-            _army.AddCredits(SpawnCost);
-            _army.ReleaseSlot();
-            Debug.LogWarning("UnitSummonController: spawn failed after reservation. Rolled back.");
-            return false;
+            var unit = _spawner.SpawnUnitAt(
+                teamId: teamId,
+                level: levelToUse,
+                position: pos,
+                rotation: rot,
+                prefab: _prefab,
+                explicitEnemyBase: null,
+                upstreamAlreadyReserved: true
+            );
+
+            if (!unit)
+            {
+                if (HasStockLimit) { StockCurrent++; RaiseStock(); }
+                _army.AddCredits(SpawnCost);
+                _army.ReleaseSlot();
+                Debug.LogWarning("UnitSummonController: spawn failed after reservation. Rolled back.");
+                return false;
+            }
+
+            // Пистолетчик сам держит слот (сквод); одиночные — через ReleaseSlotOnDestroy
+            bool isPistolier = unit is Units.Logic.PistolierLogic;
+            if (!isPistolier)
+            {
+                if (unit.GetComponent<UnitDeathReporter>() == null)
+                    unit.gameObject.AddComponent<UnitDeathReporter>();
+                var rel = unit.gameObject.AddComponent<ReleaseSlotOnDestroy>();
+                rel.Init(_army);
+            }
+        }
+        else
+        {
+            // Группа: один "тикет" на всю группу, слот освобождается,
+            // когда умрёт последний участник
+            var ticketGO = new GameObject($"SquadTicket_{_prefab.name}");
+            var ticket = ticketGO.AddComponent<GroupSlotTicket>();
+            ticket.Init(_army);
+
+            int spawned = 0;
+            float radius = Mathf.Max(0.3f, spawnRadius * 0.5f);
+
+            for (int k = 0; k < spawnCount; k++)
+            {
+                // небольшое разведение вокруг базовой точки
+                Vector2 c = UnityEngine.Random.insideUnitCircle * radius;
+                Vector3 p = new Vector3(pos.x + c.x, pos.y, pos.z + c.y);
+
+                var unit = _spawner.SpawnUnitAt(
+                    teamId: teamId,
+                    level: levelToUse,
+                    position: p,
+                    rotation: rot,
+                    prefab: _prefab,
+                    explicitEnemyBase: null,
+                    upstreamAlreadyReserved: true
+                );
+
+                if (!unit) continue;
+
+                // каждый участник сообщает тикету о своей смерти
+                if (unit.GetComponent<UnitDeathReporter>() == null)
+                    unit.gameObject.AddComponent<UnitDeathReporter>();
+                var n = unit.gameObject.AddComponent<NotifyGroupOnDestroy>();
+                n.Init(ticket);
+
+                ticket.RegisterMember();
+                spawned++;
+            }
+
+            // если никого не заспавнили — полный откат
+            if (spawned == 0)
+            {
+                if (HasStockLimit) { StockCurrent++; RaiseStock(); }
+                _army.AddCredits(SpawnCost);
+                _army.ReleaseSlot();
+                Destroy(ticketGO);
+                Debug.LogWarning("UnitSummonController: group spawn failed. Rolled back.");
+                return false;
+            }
         }
 
-        // 6) Slot release strategy: squads (e.g., pistolier) держат слот тикетом; одиночные — через компонент ниже
-        bool isPistolier = unit is Units.Logic.PistolierLogic;
-        if (!isPistolier)
-        {
-            if (unit.GetComponent<UnitDeathReporter>() == null)
-                unit.gameObject.AddComponent<UnitDeathReporter>();
-            var rel = unit.gameObject.AddComponent<ReleaseSlotOnDestroy>();
-            rel.Init(_army);
-        }
-
-        // 7) BIG refill if ушли в ноль
+        // 6) Start BIG refill if needed
         if (StockMode == UnitData.StockMode.LimitedWithRecharge && StockCurrent == 0)
             StartRefillToMaxIfNeeded().Forget();
 
@@ -239,7 +285,8 @@ public class UnitSummonController : MonoBehaviour
 
     private void RaiseStock()
     {
-        OnStockChanged?.Invoke(HasStockLimit ? Mathf.Max(0, StockCurrent) : -1, HasStockLimit ? Mathf.Max(0, StockMax) : -1);
+        OnStockChanged?.Invoke(HasStockLimit ? Mathf.Max(0, StockCurrent) : -1,
+                               HasStockLimit ? Mathf.Max(0, StockMax)    : -1);
     }
 
     private async UniTaskVoid StartRefillToMaxIfNeeded()
@@ -332,10 +379,50 @@ public class UnitSummonController : MonoBehaviour
         return null;
     }
 
+    // --- helpers for multi-spawn ---
+
+    private int GetSpawnCountForLevelFromData(int level)
+    {
+        if (_prefab is Units.Logic.PistolierLogic)
+            return 1;
+
+        if (_unitData is Units.Data.RocketData rd)
+            return Mathf.Max(1, rd.GetSpawnCountForLevel(level));
+
+        return 1;
+    }
+
     private sealed class ReleaseSlotOnDestroy : MonoBehaviour
     {
         private IArmyEconomy _army;
         public void Init(IArmyEconomy a) => _army = a;
         private void OnDestroy() => _army?.ReleaseSlot();
+    }
+
+    private sealed class GroupSlotTicket : MonoBehaviour
+    {
+        private IArmyEconomy _army;
+        private int _alive;
+
+        public void Init(IArmyEconomy a) => _army = a;
+
+        public void RegisterMember() => _alive++;
+
+        public void OnMemberDestroyed()
+        {
+            _alive--;
+            if (_alive <= 0)
+            {
+                _army?.ReleaseSlot();
+                Destroy(gameObject);
+            }
+        }
+    }
+
+    private sealed class NotifyGroupOnDestroy : MonoBehaviour
+    {
+        private GroupSlotTicket _ticket;
+        public void Init(GroupSlotTicket t) => _ticket = t;
+        private void OnDestroy() => _ticket?.OnMemberDestroyed();
     }
 }

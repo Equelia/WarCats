@@ -535,7 +535,6 @@ GameObject:
   - component: {fileID: 7353702802361941524}
   - component: {fileID: 9118068610625576302}
   - component: {fileID: 8588552593368324280}
-  - component: {fileID: 8023823797174286547}
   m_Layer: 9
   m_Name: RawImage
   m_TagString: Untagged
@@ -618,25 +617,7 @@ MonoBehaviour:
   clearColor: {r: 0, g: 0, b: 0, a: 0}
   modelEuler: {x: 0, y: 135, z: 0}
   modelScale: 1
-  addDirectionalLight: 1
-  lightColor: {r: 1, g: 1, b: 1, a: 1}
-  lightIntensity: 1.2
-  lightEuler: {x: 50, y: -30, z: 0}
   iconLayerName: UIIcon
---- !u!114 &8023823797174286547
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7317741179634992460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 959e603ddebe44eab211c750dbb089cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  deck: {fileID: 11400000, guid: 04a31fdc8d2a44442957939736400a64, type: 2}
-  entryIndex: 0
 --- !u!1 &7678793639282937615
 GameObject:
   m_ObjectHideFlags: 0

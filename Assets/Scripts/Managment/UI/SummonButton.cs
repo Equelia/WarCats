@@ -27,7 +27,6 @@ public class SummonButton : MonoBehaviour
         controller = GetComponent<UnitSummonController>();
 
         button.onClick.AddListener(OnClick);
-        ShowEmptySlot(); // безопасное стартовое состояние
     }
 
     private void OnDestroy()
@@ -51,7 +50,6 @@ public class SummonButton : MonoBehaviour
 
         _configured = true;
 
-        // визуально активируем
         var cg = GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
         cg.alpha = 1f;
 

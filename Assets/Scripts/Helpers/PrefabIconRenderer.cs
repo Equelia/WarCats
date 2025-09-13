@@ -27,15 +27,13 @@ public class PrefabIconRenderer : MonoBehaviour
     [Tooltip("Optional uniform scale multiplier for the model.")]
     public float modelScale = 1f;
 
-    [Header("Lighting")]
-    public bool addDirectionalLight = true;
-    public Color lightColor = Color.white;
-    public float lightIntensity = 1.2f;
-    public Vector3 lightEuler = new Vector3(50, -30, 0);
-
     [Header("Layer")]
     [Tooltip("Layer used so only the icon camera sees the model.")]
     public string iconLayerName = "UIIcon";
+    
+    private static readonly float RigStep = 50f;   
+    private static readonly Vector3 RigBase = new Vector3(10000f, 10000f, 10000f);
+
 
     // Runtime stuff
     private GameObject _rigRoot;
@@ -76,6 +74,8 @@ public class PrefabIconRenderer : MonoBehaviour
     public void RenderPrefab(GameObject prefab)
     {
         if (!_iconCam) BuildRig();
+        
+        if (target) target.enabled = true;
 
         if (_instance) DestroyImmediate(_instance);
         _instance = Instantiate(prefab, _rigRoot.transform);
@@ -96,9 +96,9 @@ public class PrefabIconRenderer : MonoBehaviour
 
         _rigRoot = new GameObject("[IconRig]");
         _rigRoot.hideFlags = HideFlags.DontSave;
-        _rigRoot.transform.position = new Vector3(9999, 9999, 9999); // away from scene
+        _rigRoot.transform.position = GetIsolatedRigPosition();
 
-        // Camera
+        // Камера
         var camGO = new GameObject("IconCamera");
         camGO.transform.SetParent(_rigRoot.transform, false);
         _iconCam = camGO.AddComponent<Camera>();
@@ -111,7 +111,7 @@ public class PrefabIconRenderer : MonoBehaviour
         _iconCam.nearClipPlane = 0.05f;
         _iconCam.farClipPlane = 1000f;
 
-        // Only render the icon layer
+        // Только выбранный слой
         _iconCam.cullingMask = (1 << _iconLayer);
 
         _rt = new RenderTexture(textureWidth, textureHeight, 24, RenderTextureFormat.ARGB32);
@@ -120,19 +120,9 @@ public class PrefabIconRenderer : MonoBehaviour
         _iconCam.targetTexture = _rt;
         target.texture = _rt;
 
-        // Optional light
-        if (addDirectionalLight)
-        {
-            var lightGO = new GameObject("KeyLight");
-            lightGO.transform.SetParent(_rigRoot.transform, false);
-            lightGO.transform.localRotation = Quaternion.Euler(lightEuler);
-            var light = lightGO.AddComponent<Light>();
-            light.type = LightType.Directional;
-            light.color = lightColor;
-            light.intensity = lightIntensity;
-            light.cullingMask = (1 << _iconLayer);
-        }
+        // 🔴 Никакого дополнительного DirectionalLight здесь нет!
     }
+
 
     private void Cleanup()
     {
@@ -223,5 +213,13 @@ public class PrefabIconRenderer : MonoBehaviour
         _rt.Create();
         _iconCam.targetTexture = _rt;
         target.texture = _rt;
+    }
+    
+    private Vector3 GetIsolatedRigPosition()
+    {
+        int id = Mathf.Abs(GetInstanceID());
+        int ix =  (id      ) & 63;  // 0..63
+        int iz = ((id >> 6)) & 63;  // 0..63
+        return RigBase + new Vector3(ix * RigStep, 0f, iz * RigStep);
     }
 }
