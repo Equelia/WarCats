@@ -18,6 +18,13 @@ namespace Units.Logic
         protected override void OnRangedBuilt() { _data = Context.UnitData as RocketData; }
         protected override ICombatService CreateCombatService() => new RocketCombatService(this);
 
+        protected override void Awake()
+        {
+            base.Awake();
+            
+            enemyUnitMask = LayerMask.GetMask("Unit");
+        }
+
         private sealed class RocketCombatService : RangedCombatServiceBase
         {
             public RocketCombatService(RocketLogic owner) : base(owner) {}

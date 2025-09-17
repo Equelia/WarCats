@@ -22,6 +22,13 @@ namespace Units.Logic
         protected ReusableEffect _muzzleFx;
         protected ReusableEffect _muzzleSmokeFx;
 
+        protected override void Awake()
+        {
+            base.Awake();
+
+            hitMask = LayerMask.GetMask("Default", "Water", "Walkable", "Cover");
+        }
+
         protected override void OnBuilt()
         {
             if (muzzleFlashInstance)
@@ -54,16 +61,27 @@ namespace Units.Logic
         }
 
         /// <summary>Spawns a VisualBullet already launched forward. Returns null if no prefab.</summary>
-        protected VisualBullet SpawnBullet(UnitContext ctx, float speed)
+        protected VisualBullet SpawnBullet(UnitContext ctx, float speed, Vector3 dirNormalized)
         {
             if (!projectilePrefab) return null;
-            var (o, f) = GetOriginForward(ctx);
-            var go = VfxPool.Get(projectilePrefab, o, Quaternion.LookRotation(f, Vector3.up));
+
+            var (o, _) = GetOriginForward(ctx);
+            var dir = dirNormalized.sqrMagnitude > 1e-6f ? dirNormalized : ctx.Transform.forward;
+            dir.y = Mathf.Clamp(dir.y, -0.98f, 0.98f); // защитимся от строго вертикального
+
+            var go = VfxPool.Get(projectilePrefab, o, Quaternion.LookRotation(dir, Vector3.up));
             var vb = go.GetComponent<VisualBullet>() ?? go.AddComponent<VisualBullet>();
             vb.ResetTrailIfAny();
             vb.SetSpeed(speed);
-            vb.LaunchLinear(o, f);
+            vb.LaunchLinear(o, dir);
             return vb;
         }
+
+        protected VisualBullet SpawnBullet(UnitContext ctx, float speed)
+        {
+            var (_, f) = GetOriginForward(ctx);
+            return SpawnBullet(ctx, speed, f);
+        }
+
     }
 }

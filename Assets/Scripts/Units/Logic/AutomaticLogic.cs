@@ -16,7 +16,9 @@ namespace Units.Logic
 
         private sealed class AutomaticCombatService : RangedCombatServiceBase
         {
-            public AutomaticCombatService(AutomaticLogic owner) : base(owner) {}
+            public AutomaticCombatService(AutomaticLogic owner) : base(owner)
+            {
+            }
 
             protected override void OnShotResolvedFx(UnitContext ctx, Transform target, bool didHit)
             {
@@ -25,7 +27,8 @@ namespace Units.Logic
 
             private async UniTaskVoid PlayBurstAsync(AutomaticLogic o, UnitContext ctx, Transform target, bool didHit)
             {
-                var data = o._data; if (data == null) return;
+                var data = o._data;
+                if (data == null) return;
 
                 int burst = Mathf.Max(1, data.burstCount);
                 float gap = Mathf.Max(0f, data.burstInterval);
@@ -39,14 +42,16 @@ namespace Units.Logic
                 }
             }
 
-            private void FireOne(AutomaticLogic o, UnitContext ctx, Transform target, bool didHit, bool exact, AutomaticData data)
+            // AutomaticLogic.AutomaticCombatService
+            private void FireOne(AutomaticLogic o, UnitContext ctx, Transform target, bool didHit, bool exact,
+                AutomaticData data)
             {
-                var vb = o.SpawnBullet(ctx, data.bulletSpeed);
-                if (!vb) return;
-
                 var (origin, forward) = o.GetOriginForward(ctx);
-                var aim = target ? target.position + o.targetOffset
-                                 : origin + forward * Mathf.Max(5f, ctx.Stats.attackRange);
+
+                var aim = target
+                    ? target.position + o.targetOffset
+                    : origin + (forward.y > 0.7f ? ctx.Transform.forward : forward) *
+                    Mathf.Max(5f, ctx.Stats.attackRange);
 
                 if (!exact && target)
                 {
@@ -54,8 +59,15 @@ namespace Units.Logic
                     aim = new Vector3(aim.x + c.x, aim.y, aim.z + c.y);
                 }
 
+                var dir = (aim - origin);
+                if (dir.sqrMagnitude < 1e-4f) dir = ctx.Transform.forward; // защита от нуля
+                dir.Normalize();
+
+                var vb = o.SpawnBullet(ctx, data.bulletSpeed, dir); // <-- направленный спавн
+                if (!vb) return;
+
                 bool enemyImpact = didHit && exact;
-                Vector3 end = aim, normal = -((aim - origin).normalized);
+                Vector3 end = aim, normal = -dir;
 
                 if (target)
                 {
@@ -64,9 +76,10 @@ namespace Units.Logic
                         var col = target.GetComponentInChildren<Collider>();
                         if (col) end = col.ClosestPoint(aim);
                     }
-                    else if (Physics.Raycast(aim + Vector3.up*2f, Vector3.down, out var hit, 6f, o.hitMask))
+                    else if (Physics.Raycast(aim + Vector3.up * 2f, Vector3.down, out var hit, 6f, o.hitMask))
                     {
-                        end = hit.point; normal = hit.normal;
+                        end = hit.point;
+                        normal = hit.normal;
                     }
                 }
 
