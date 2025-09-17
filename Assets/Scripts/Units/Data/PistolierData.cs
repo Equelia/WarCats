@@ -12,15 +12,11 @@ namespace Units.Data
 		/// <summary>
 		/// Returns how many instances this data will spawn for given level (1..3).
 		/// </summary>
-		public int GetSpawnCountForLevel(int level)
+		public override int GetSpawnCountForLevel(int level)
 		{
 			int idx = Mathf.Clamp(level, 1, 3) - 1;
 			if (spawnCountPerSlot == null || spawnCountPerSlot.Length < 3)
-			{
-				// fallback to 1,2,3
-				return idx + 1;
-			}
-
+				return idx + 1;            // fallback: 1,2,3
 			return Mathf.Max(1, spawnCountPerSlot[idx]);
 		}
 	}

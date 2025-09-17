@@ -2,12 +2,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using Units.Logic;
 
 public class ArmyUIController : MonoBehaviour
 {
     [Header("Targets")]
-    [SerializeField] private ArmyEconomy armyEconomy; // the player's army logic (teamId=0)
+    [SerializeField] private ArmyEconomy armyEconomy;
+    
+    [SerializeField] private UnitBootstrapper modularPrefab;
 
     [Header("Top Fields")]
     [SerializeField] private TMP_Text creditsText;
@@ -22,15 +23,12 @@ public class ArmyUIController : MonoBehaviour
     [SerializeField] private LampRowUI lampRow;
 
     [Header("Summon Buttons")]
-    [Tooltip("Any component that implements IUnitDeckProvider (e.g., SceneUnitDeck)")]
     [SerializeField] private MonoBehaviour deckProviderBehaviour;
     private IUnitDeckProvider deckProvider;
     [SerializeField] private SummonButton[] summonButtons = new SummonButton[6];
 
     [Header("Spawn Routing")]
     [SerializeField] private UnitSpawner spawner;
-
-    [Tooltip("Optional shared spawn areas for all summon slots (can be left empty if each controller has its own).")]
     [SerializeField] private SpawnAreaBase[] sharedSpawnAreas;
 
     [Header("Economy Buttons")]
@@ -47,7 +45,6 @@ public class ArmyUIController : MonoBehaviour
     {
         if (!armyEconomy) armyEconomy = FindObjectOfType<ArmyEconomy>();
 
-        // events
         if (armyEconomy)
         {
             armyEconomy.OnCreditsChanged += OnCreditsChanged;
@@ -62,10 +59,7 @@ public class ArmyUIController : MonoBehaviour
             OnXpLevelChanged(armyEconomy.State.xpLevel);
             OnXpChanged(armyEconomy.State.XpFill);
             OnSlotsChanged(armyEconomy.State.occupiedSlots, armyEconomy.State.maxSlots);
-            OnArmyUpgradeProgressChanged(
-                armyEconomy.State.armyUpgradeProgress,
-                armyEconomy.State.armyUpgradeStepsRequired
-            );
+            OnArmyUpgradeProgressChanged(armyEconomy.State.armyUpgradeProgress, armyEconomy.State.armyUpgradeStepsRequired);
         }
 
         if (btnUpgradeLevel) btnUpgradeLevel.onClick.AddListener(OnClickUpgradeLevel);
@@ -97,16 +91,13 @@ public class ArmyUIController : MonoBehaviour
     }
 
     // -------- Economy -> UI ----------
-    private void OnCreditsChanged(int value) { if (creditsText) creditsText.text = value.ToString(); }
-    private void OnPointsChanged(int value)  { if (pointsText) pointsText.text   = value.ToString(); }
-    private void OnXpLevelChanged(int xpLvl) { if (levelText) levelText.text     = xpLvl.ToString(); }
-    private void OnXpChanged(float fill01)   { xpBar?.Set01(fill01); }
-    private void OnSlotsChanged(int occupied, int max) { lampRow?.SetState(occupied, max); }
-    private void OnArmyUpgradeProgressChanged(int current, int required)
-    {
-        if (armyUpgradeProgressText)
-            armyUpgradeProgressText.text = $"{current}\n---\n{required}";
-    }
+    private void OnCreditsChanged(int v) { if (creditsText) creditsText.text = v.ToString(); }
+    private void OnPointsChanged(int v)  { if (pointsText) pointsText.text   = v.ToString(); }
+    private void OnXpLevelChanged(int l) { if (levelText) levelText.text     = l.ToString(); }
+    private void OnXpChanged(float f)    { xpBar?.Set01(f); }
+    private void OnSlotsChanged(int occ, int max) { lampRow?.SetState(occ, max); }
+    private void OnArmyUpgradeProgressChanged(int cur, int req)
+    { if (armyUpgradeProgressText) armyUpgradeProgressText.text = $"{cur}\n---\n{req}"; }
 
     // -------- UI -> Economy ----------
     private void OnClickUpgradeLevel() => armyEconomy?.TryUpgradeArmyLevelStep();
@@ -121,12 +112,12 @@ public class ArmyUIController : MonoBehaviour
             var btn = summonButtons[i];
             if (!btn) continue;
 
-            UnitController unitPrefab = null;
+            UnitArchetype archetype = null;
 
             bool hasEntry =
                 deckProvider != null &&
                 i < deckProvider.VisibleSlots &&
-                deckProvider.TryGetPrefab(i, out unitPrefab); 
+                deckProvider.TryGetArchetype(i, out archetype);
 
             if (!hasEntry)
             {
@@ -136,12 +127,11 @@ public class ArmyUIController : MonoBehaviour
                 continue;
             }
 
-            // 3) Контроллер призыва
             var controller = btn.GetComponent<UnitSummonController>();
             if (!controller) controller = btn.gameObject.AddComponent<UnitSummonController>();
 
             controller.Configure(
-                prefab: unitPrefab,                         
+                archetype: archetype,
                 army: armyEconomy,
                 spawner: spawner,
                 baseProvider: FindObjectOfType<MonoBehaviour>() as ITeamBaseProvider,
@@ -151,19 +141,15 @@ public class ArmyUIController : MonoBehaviour
                 forceLevel: null,
                 forceSpawnRadius: null
             );
-            
-            var raw = btn.GetComponentInChildren<UnityEngine.UI.RawImage>(true);
-            if (raw)
+
+            var iconRenderer = btn.GetComponentInChildren<PrefabIconRenderer>(true);
+            if (iconRenderer)
             {
-                raw.enabled = true;
-                raw.gameObject.SetActive(true); 
+                iconRenderer.gameObject.SetActive(true);
+                iconRenderer.RenderModularArchetype(modularPrefab, archetype, teamId: 0);
             }
-            
-            var icon = btn.GetComponentInChildren<PrefabIconRenderer>(true);
-            if (icon) icon.RenderPrefab(unitPrefab.gameObject);
 
             btn.BindToController(controller);
         }
     }
-
 }

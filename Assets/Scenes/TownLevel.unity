@@ -1028,6 +1028,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   armyEconomy: {fileID: 1340287228}
+  modularPrefab: {fileID: 8852521926508749481, guid: b682f78a51fdc7745afa72f589aebfb2, type: 3}
   creditsText: {fileID: 579433138}
   pointsText: {fileID: 1457905300}
   levelText: {fileID: 1531716430}
@@ -1270,6 +1271,10 @@ PrefabInstance:
     - target: {fileID: 1882222105432856, guid: 5269390e4b6524b308819ae611fb8441, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1882222105432856, guid: 5269390e4b6524b308819ae611fb8441, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1882222105432856, guid: 5269390e4b6524b308819ae611fb8441, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -1714,6 +1719,10 @@ PrefabInstance:
       propertyPath: provider
       value: 
       objectReference: {fileID: 280804583}
+    - target: {fileID: 8588552593368324280, guid: 758401b031cd55746b179173f5c0383b, type: 3}
+      propertyPath: modelScale
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2444,11 +2453,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eb4808d7a7343b0bb9e4802baa0bc8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allyPrefab: {fileID: 6093988759227092507, guid: c8e1b1bd6f2395347ab452a4265144f0, type: 3}
-  enemyPrefab: {fileID: 4915153358868269053, guid: 63b0000dd8b027c49be95ff45790710a, type: 3}
-  alliesSpawnPoint: {fileID: 1739608652}
-  enemySpawnPoint: {fileID: 1805356224}
+  modularPrefab: {fileID: 8852521926508749481, guid: b682f78a51fdc7745afa72f589aebfb2, type: 3}
   unitsRoot: {fileID: 225770678}
+  spawnAreas:
+  - {fileID: 1101024295}
+  - {fileID: 1305658001}
+  fallbackSpawnRadius: 4
+  enemySniperArchetype: {fileID: 11400000, guid: 380da10fe3aff9c48aceec10aa49c737, type: 2}
+  enemyPistolArchetype: {fileID: 11400000, guid: 8a7db0dfef5c5104fb673a726fe5c3f4, type: 2}
+  enemyAutomataArchetype: {fileID: 11400000, guid: a918ef307e844874d9036e2eef0b0e82, type: 2}
+  enemyRocketerArchetype: {fileID: 11400000, guid: e290bd54314a09a44833f7dfbafd4e00, type: 2}
 --- !u!4 &225770678
 Transform:
   m_ObjectHideFlags: 0
@@ -2778,12 +2792,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visibleSlots: 6
   entries:
-  - unitPrefab: {fileID: 6093988759227092507, guid: c8e1b1bd6f2395347ab452a4265144f0, type: 3}
-  - unitPrefab: {fileID: 790431074090512105, guid: dccac060836a02547af7ff7b9b84e6d8, type: 3}
-  - unitPrefab: {fileID: 7590666451121405982, guid: 89879526d42797c468b19babeba42f69, type: 3}
-  - unitPrefab: {fileID: 7565066977461168719, guid: 572c9ff74353edb489cd0dc35443e70b, type: 3}
-  - unitPrefab: {fileID: 0}
-  - unitPrefab: {fileID: 0}
+  - archetype: {fileID: 11400000, guid: 8a7db0dfef5c5104fb673a726fe5c3f4, type: 2}
+  - archetype: {fileID: 11400000, guid: a918ef307e844874d9036e2eef0b0e82, type: 2}
+  - archetype: {fileID: 11400000, guid: e290bd54314a09a44833f7dfbafd4e00, type: 2}
+  - archetype: {fileID: 11400000, guid: 380da10fe3aff9c48aceec10aa49c737, type: 2}
+  - archetype: {fileID: 0}
+  - archetype: {fileID: 0}
 --- !u!4 &280804584
 Transform:
   m_ObjectHideFlags: 0
@@ -5681,6 +5695,10 @@ PrefabInstance:
     - target: {fileID: 198642, guid: b1117364f671eb048a98201474613a94, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 198642, guid: b1117364f671eb048a98201474613a94, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 198642, guid: b1117364f671eb048a98201474613a94, type: 3}
       propertyPath: m_TagString
@@ -14420,6 +14438,10 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 198642, guid: b1117364f671eb048a98201474613a94, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 198642, guid: b1117364f671eb048a98201474613a94, type: 3}
       propertyPath: m_TagString
       value: Cover
       objectReference: {fileID: 0}
@@ -15217,16 +15239,16 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1965346248}
+  - {fileID: 1072854729}
+  - {fileID: 335242020}
+  - {fileID: 1622416695}
   - {fileID: 1023323897}
   - {fileID: 486180413}
-  - {fileID: 1340287231}
-  - {fileID: 753010331}
-  - {fileID: 1965346248}
   - {fileID: 445829106}
-  - {fileID: 1072854729}
-  - {fileID: 280804584}
-  - {fileID: 91437419}
-  - {fileID: 1622416695}
-  - {fileID: 335242020}
   - {fileID: 1405880812}
+  - {fileID: 753010331}
   - {fileID: 225770678}
+  - {fileID: 1340287231}
+  - {fileID: 91437419}
+  - {fileID: 280804584}

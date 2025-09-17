@@ -36,13 +36,16 @@ namespace Units.Logic
         public bool debugCover = false;
 
         [Inject] protected ITeamBaseProvider baseProvider;
+        
 
         // Public accessors
         public int TeamId => teamId;
         public UnitContext Context => _ctx;
         public UnitData UnitDataAsset => unitData;
-
-
+        
+        private bool _built;
+        private Transform _pendingEnemyBase;
+        
         // Core
         protected UnitContext _ctx;
         protected StateMachine _fsm;
@@ -55,14 +58,16 @@ namespace Units.Logic
 
         protected virtual void Awake()
         {
+            if (unitData != null && !_built) Build();
+        }
+        
+        private void Build()
+        {
+            if (_built) return;
+            _built = true;
+
             var agent = GetComponent<NavMeshAgent>();
             var animator = GetComponentInChildren<Animator>();
-
-            if (unitData == null)
-            {
-                Debug.LogError($"{name}: UnitData not assigned.", this);
-                enabled = false; return;
-            }
 
             _ctx = new UnitContext
             {
@@ -77,16 +82,17 @@ namespace Units.Logic
                 Transform = transform,
                 Animator = animator,
                 Agent = agent,
-                EnemyBase = baseProvider != null ? baseProvider.GetOpposingBaseTransform(teamId) : null,
+                EnemyBase = _pendingEnemyBase != null
+                    ? _pendingEnemyBase
+                    : (baseProvider != null ? baseProvider.GetOpposingBaseTransform(teamId) : null),
 
-                Cts = new CancellationTokenSource(),
+                Cts = new System.Threading.CancellationTokenSource(),
                 IsInitialized = true
             };
 
             _ctx.Stats = unitData.GetStatsForLevel(_ctx.Level);
             _ctx.CurrentHealth = _ctx.Stats.maxHealth;
 
-            // Agent defaults (kept consistent with original)
             agent.speed = _ctx.Stats.moveSpeed;
             agent.stoppingDistance = _ctx.Stats.attackRange;
             agent.angularSpeed = 120f;
@@ -94,33 +100,58 @@ namespace Units.Logic
             agent.updateRotation = true;
             agent.updatePosition = true;
 
-            // Services
             _move = new MovementService();
             _sensor = new SensorService();
             _cover  = new CoverService();
-            _combat = CreateCombatService(); // overridable hook for subclasses
+            _combat = CreateCombatService();
 
-            // FSM
             _fsm = new StateMachine(_ctx.Cts.Token);
             _ = _fsm.SetStateAsync(new Units.Logic.States.AdvanceState(_ctx, _move, _sensor, _cover, _fsm, _combat));
+
+            OnBuilt();
         }
         
+        protected virtual void OnBuilt() { }
+
+        /// <summary>
+        /// Finishes construction after Bootstrapper assigns UnitData / sockets.
+        /// Safe to call multiple times.
+        /// </summary>
+        public void BootstrapFinalize()
+        {
+            if(!_built) Build();
+        }
+
         public void Initialize(int team, int initLevel = 1, Transform explicitEnemyBase = null)
         {
-            // Update serialized field for debugging/inspector clarity
-            this.level  = Mathf.Clamp(initLevel, 1, 3);
-            this.teamId = team;
-
-            // If Awake already created the context, apply immediately
-            if (_ctx != null)
+            level  = Mathf.Clamp(initLevel, 1, 3);
+            teamId = team;
+            _pendingEnemyBase = explicitEnemyBase;
+            
+            if (!_built)
             {
-                _ctx.TeamId = team;
-                SetLevel(initLevel); // will refresh stats, health, agent speed/range
+                Build();
+                return;
+            }
 
-                if (explicitEnemyBase != null)
-                    _ctx.EnemyBase = explicitEnemyBase;
-                else if (baseProvider != null)
-                    _ctx.EnemyBase = explicitEnemyBase ?? (baseProvider != null  ? baseProvider.GetOpposingBaseTransform(teamId) : null);            }
+            _ctx.TeamId = team;
+            SetLevel(initLevel);
+
+            _ctx.EnemyBase = explicitEnemyBase != null
+                ? explicitEnemyBase
+                : (baseProvider != null ? baseProvider.GetOpposingBaseTransform(teamId) : _ctx.EnemyBase);
+        }
+        
+        private Transform TryResolveEnemyBase(int team)
+        {
+            if (baseProvider != null)
+                return baseProvider.GetOpposingBaseTransform(team);
+
+            var provider = Object.FindObjectOfType<TeamBaseProvider>();
+            if (provider) return provider.GetOpposingBaseTransform(team);
+
+            var go = GameObject.FindWithTag("EnemyBase");  
+            return go ? go.transform : null;
         }
 
         protected virtual ICombatService CreateCombatService() => new CombatService();
@@ -140,7 +171,7 @@ namespace Units.Logic
 
         protected virtual void Update()
         {
-            if (!_ctx.IsInitialized) return;
+            if (_ctx == null || !_ctx.IsInitialized) return;
             if (_ctx.CurrentHealth <= 0) return;
 
             // keep agent speed/stopping synced unless temp override is active
@@ -197,4 +228,5 @@ namespace Units.Logic
             }
         }
     }
+
 }

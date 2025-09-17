@@ -1,11 +1,10 @@
 ﻿using System;
 using UnityEngine;
-using Units.Logic;
 
 public interface IUnitDeckProvider
 {
 	int VisibleSlots { get; }
-	bool TryGetPrefab(int index, out UnitController prefab);
+	bool TryGetArchetype(int index, out UnitArchetype archetype);
 }
 
 [DisallowMultipleComponent]
@@ -14,8 +13,8 @@ public class SceneUnitDeck : MonoBehaviour, IUnitDeckProvider
 	[Serializable]
 	public struct Entry
 	{
-		[Tooltip("Prefab with UnitController (ally variant for the player).")]
-		public UnitController unitPrefab;
+		[Tooltip("Archetype (SO) of the unit")]
+		public UnitArchetype archetype;
 	}
 
 	[Range(1, 6)]
@@ -26,12 +25,12 @@ public class SceneUnitDeck : MonoBehaviour, IUnitDeckProvider
 
 	public int VisibleSlots => Mathf.Clamp(visibleSlots, 1, entries != null ? entries.Length : 0);
 
-	public bool TryGetPrefab(int index, out UnitController prefab)
+	public bool TryGetArchetype(int index, out UnitArchetype archetype)
 	{
-		prefab = null;
+		archetype = null;
 		if (entries == null) return false;
 		if (index < 0 || index >= entries.Length) return false;
-		prefab = entries[index].unitPrefab;
-		return prefab != null;
+		archetype = entries[index].archetype;
+		return archetype != null;
 	}
 }

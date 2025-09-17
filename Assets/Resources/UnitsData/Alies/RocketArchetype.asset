@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e114c28a56b47b7be456cb2fa83ebae, type: 3}
+  m_Name: RocketArchetype
+  m_EditorClassIdentifier: 
+  displayName: Rocket
+  appearanceKind: 3
+  enemyUsesFixedHead: 1
+  enemyHeadKey: Head_Fox
+  logicKind: 3
+  unitData: {fileID: 11400000, guid: 653f5fda3ad87c149a6e178534d36995, type: 2}
+  baseController: {fileID: 9100000, guid: b22f09821764bc1459b0b27c12add418, type: 2}
+  overrideController: {fileID: 0}

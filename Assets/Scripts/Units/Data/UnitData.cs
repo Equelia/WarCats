@@ -108,8 +108,10 @@ namespace Units.Data
 
             return stats;
         }
+        
+        public virtual int GetSpawnCountForLevel(int level) => 1;
     }
-
+    
     /// <summary>Simple container for computed runtime stats.</summary>
     public struct UnitRuntimeStats
     {

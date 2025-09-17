@@ -608,12 +608,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36429fa20c764632854be0c55daf5e94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitPrefab: {fileID: 0}
   target: {fileID: 9118068610625576302}
-  textureWidth: 256
-  textureHeight: 256
-  cameraFov: 25
-  padding: 0.15
+  textureWidth: 1024
+  textureHeight: 1024
+  cameraFov: 1
+  padding: 0
   clearColor: {r: 0, g: 0, b: 0, a: 0}
   modelEuler: {x: 0, y: 135, z: 0}
   modelScale: 1

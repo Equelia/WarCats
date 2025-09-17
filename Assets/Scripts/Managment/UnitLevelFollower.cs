@@ -1,28 +1,31 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 using Units.Logic;
 using Zenject;
 
-[RequireComponent(typeof(UnitController))]
 public class UnitLevelFollower : MonoBehaviour
 {
 	private UnitController _unit;
 	private IArmyEconomy _army;
 
-	private void Awake()
+	private async void Start()
 	{
-		_unit = GetComponent<UnitController>();
-	}
+		// Wait one frame so Bootstrapper can finish Setup/Initialize
+		await UniTask.Yield();
 
-	private void Start()
-	{
-		if (_army == null)
+		_unit = GetComponent<UnitController>() ?? GetComponentInChildren<UnitController>();
+		if (_unit == null) { Debug.LogWarning($"{name}: UnitController not found."); return; }
+
+		// Wait until ArmyDirectory has the army for this team (up to 1s)
+		float t = 0f;
+		while ((_army = ArmyDirectory.Get(_unit.TeamId)) == null && t < 1f)
 		{
-			Debug.LogWarning($"{name}: Army not found for team {_unit.TeamId}. Level won't auto-sync.");
-			return;
+			await UniTask.Yield();
+			t += Time.deltaTime;
 		}
+		if (_army == null) { Debug.LogWarning($"{name}: Army not found for team {_unit.TeamId}."); return; }
 
 		_unit.SetLevel(Mathf.Max(1, _army.State.level));
-
 		_army.OnLevelChanged += HandleLevelChanged;
 	}
 
