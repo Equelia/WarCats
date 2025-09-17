@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Automata
   spawnCost: 25
-  attackRange: 12
+  attackRange: 17
   attackCooldown: 0.5
   accuracy: 0.65
   vulnerability: 0.2

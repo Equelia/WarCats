@@ -9,17 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4a7eef9eafa48c3a4629742248bc1c7, type: 3}
-  m_Name: SniperData
+  m_Script: {fileID: 11500000, guid: 23f7356a3f19440ca338873e7ea226e5, type: 3}
+  m_Name: EnemyRocketData
   m_EditorClassIdentifier: 
-  unitName: Sniper
-  spawnCost: 85
-  attackRange: 25
-  attackCooldown: 3
-  accuracy: 0.95
-  vulnerability: 0.05
-  damage: 35
-  maxHealth: 22
+  unitName: Rocketeer
+  spawnCost: 65
+  attackRange: 8
+  attackCooldown: 13
+  accuracy: 1
+  vulnerability: 0.1
+  damage: 10
+  maxHealth: 30
   moveSpeed: 0.8
   levelModifiers:
   - level: 1
@@ -35,13 +35,13 @@ MonoBehaviour:
     attackCooldownMultiplier: 1
     accuracyAdd: 0
     damageAdd: 0
-    healthAdd: 12
-    moveSpeedMultiplier: 1
+    healthAdd: 0
+    moveSpeedMultiplier: 1.25
     vulnerabilityAdd: 0
   - level: 3
     attackRangeMultiplier: 1
-    attackCooldownMultiplier: 0.65
-    accuracyAdd: 0.02
+    attackCooldownMultiplier: 1
+    accuracyAdd: 0
     damageAdd: 0
     healthAdd: 0
     moveSpeedMultiplier: 1
@@ -50,4 +50,6 @@ MonoBehaviour:
   startingStock: 0
   maxStock: 0
   rechargeCooldown: 10
-  bulletSpeed: 85
+  splashRadius: 2.5
+  rocketSpeed: 25
+  spawnCountPerSlot: 010000000100000002000000

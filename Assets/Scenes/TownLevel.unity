@@ -366,6 +366,50 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &26602321
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 26602322}
+  - component: {fileID: 26602323}
+  m_Layer: 0
+  m_Name: EnemyArmyDirectory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &26602322
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26602321}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -63.4932, y: -69.67869, z: 97.59468}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2011433807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &26602323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26602321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2997035f1ae84491a5d57cafbe206cda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &31994317
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1050,7 +1094,7 @@ MonoBehaviour:
   btnIncreaseCapacity: {fileID: 1760751976}
   btnExchangePoint: {fileID: 456595418}
   capacityIncreaseBy: 1
-  exchangeCreditsPerPoint: 50
+  exchangeCreditsPerPoint: 25
 --- !u!114 &91437416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4155,6 +4199,59 @@ PrefabInstance:
       addedObject: {fileID: 1101024293}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 77c4b35fc70cb7c419b2024c182fcecb, type: 3}
+--- !u!1 &446687775
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 446687777}
+  - component: {fileID: 446687776}
+  m_Layer: 0
+  m_Name: EnemyUnitSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &446687776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446687775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eb4808d7a7343b0bb9e4802baa0bc8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  modularPrefab: {fileID: 8852521926508749481, guid: b682f78a51fdc7745afa72f589aebfb2, type: 3}
+  unitsRoot: {fileID: 446687777}
+  spawnAreas:
+  - {fileID: 1305658001}
+  fallbackSpawnRadius: 4
+  enemySniperArchetype: {fileID: 11400000, guid: 757f558679d3685458340dc863f405e8, type: 2}
+  enemyPistolArchetype: {fileID: 11400000, guid: cad3bc5135b74cd4399a206c57565e32, type: 2}
+  enemyAutomataArchetype: {fileID: 11400000, guid: f6353f4667e8e9d4482aa945177ace2d, type: 2}
+  enemyRocketerArchetype: {fileID: 11400000, guid: 210bd117f4415ba47a238b48160b9765, type: 2}
+--- !u!4 &446687777
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446687775}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2011433807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &451602901
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4513,6 +4610,81 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ad9d3c1bf87264ed8a89c188f2c1018c, type: 3}
+--- !u!1 &470169669
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 470169673}
+  - component: {fileID: 470169670}
+  - component: {fileID: 470169671}
+  m_Layer: 0
+  m_Name: EnemyArmyEconomy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &470169670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470169669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 986abb5ddea24bf880a3a6f09dff4b91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  teamId: 1
+  incomeInterval: 6
+  incomeAmount: 5
+  xpPerEnemyKill: 50
+  pointsPerLevelUp: 2
+  baseXpToLevel: 80
+  xpGrowthPerLevel: 25
+  initial:
+    level: 1
+    credits: 200
+    points: 0
+    maxSlots: 15
+    occupiedSlots: 0
+    xpLevel: 1
+    currentXp: 0
+    xpToLevel: 100
+    armyUpgradeProgress: 0
+    armyUpgradeStepsRequired: 5
+--- !u!114 &470169671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470169669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2997035f1ae84491a5d57cafbe206cda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &470169673
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470169669}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -63.4932, y: -69.67869, z: 97.59468}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2011433807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &471583753
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10188,6 +10360,58 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 758401b031cd55746b179173f5c0383b, type: 3}
+--- !u!1 &1246495354
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1246495356}
+  - component: {fileID: 1246495355}
+  m_Layer: 0
+  m_Name: EnemyDECK
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1246495355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246495354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a63de725d83f423c9cae5a94e7c4020f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visibleSlots: 6
+  entries:
+  - archetype: {fileID: 11400000, guid: cad3bc5135b74cd4399a206c57565e32, type: 2}
+  - archetype: {fileID: 11400000, guid: 757f558679d3685458340dc863f405e8, type: 2}
+  - archetype: {fileID: 11400000, guid: f6353f4667e8e9d4482aa945177ace2d, type: 2}
+  - archetype: {fileID: 11400000, guid: 210bd117f4415ba47a238b48160b9765, type: 2}
+  - archetype: {fileID: 0}
+  - archetype: {fileID: 0}
+--- !u!4 &1246495356
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246495354}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2011433807}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1250225028 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1882222105432856, guid: 5269390e4b6524b308819ae611fb8441, type: 3}
@@ -10623,7 +10847,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1340287231}
   - component: {fileID: 1340287228}
-  - component: {fileID: 1340287230}
   - component: {fileID: 1340287229}
   m_Layer: 0
   m_Name: ArmyEconomy
@@ -10645,16 +10868,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teamId: 0
-  incomeInterval: 3
+  incomeInterval: 2
   incomeAmount: 5
   xpPerEnemyKill: 20
-  pointsPerLevelUp: 10
-  baseXpToLevel: 80
-  xpGrowthPerLevel: 25
+  pointsPerLevelUp: 1
+  baseXpToLevel: 40
+  xpGrowthPerLevel: 30
   initial:
     level: 1
-    credits: 100
-    points: 10
+    credits: 35
+    points: 1
     maxSlots: 8
     occupiedSlots: 0
     xpLevel: 1
@@ -10672,18 +10895,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2997035f1ae84491a5d57cafbe206cda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1340287230
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1340287227}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6af11e9af3a64a60ab68d9b3dd20ed78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &1340287231
@@ -12273,6 +12484,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4000013008321660, guid: 5c9de7283eb7304419a30532403d04e6, type: 3}
   m_PrefabInstance: {fileID: 97222813}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1569410068
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1569410070}
+  - component: {fileID: 1569410069}
+  m_Layer: 0
+  m_Name: ArmyDirectory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1569410069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569410068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2997035f1ae84491a5d57cafbe206cda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1569410070
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569410068}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -79.64901, y: -71.039246, z: 184.76736}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1595152371 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4689866280317016, guid: 33e17b4eb3bdd4417ad545df84601c51, type: 3}
@@ -14582,6 +14837,70 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4000013398243146, guid: ec63a064dbd786c41a053bad759efb21, type: 3}
   m_PrefabInstance: {fileID: 1352336675}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2011433805
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2011433807}
+  - component: {fileID: 2011433806}
+  m_Layer: 0
+  m_Name: EnemyAI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2011433806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011433805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b21a70c801e404e8be517a83c8e6b1e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  teamId: 1
+  enemyArmy: {fileID: 470169670}
+  spawner: {fileID: 446687776}
+  deckProviderBehaviour: {fileID: 1246495355}
+  spawnAreas:
+  - {fileID: 1305658001}
+  spawnRadiusFallback: 4
+  thinkIntervalMin: 0.5
+  thinkIntervalMax: 1.5
+  minCreditsToAct: 10
+  attemptsPerTick: 3
+  preferExpensiveWhenSlotsLow: 0.7
+  rushThreshold: 120
+  pointsForLevelUp: 2
+  pointsForCapacity: 0
+  capacityIncreaseBy: 1
+--- !u!4 &2011433807
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2011433805}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -16.155811, y: -1.3605584, z: 87.17268}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1246495356}
+  - {fileID: 446687777}
+  - {fileID: 470169673}
+  - {fileID: 26602322}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &2020682247 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4837925148149094, guid: 2feb279d5cd836848941f6f7340ac552, type: 3}
@@ -15250,5 +15569,7 @@ SceneRoots:
   - {fileID: 753010331}
   - {fileID: 225770678}
   - {fileID: 1340287231}
+  - {fileID: 1569410070}
   - {fileID: 91437419}
   - {fileID: 280804584}
+  - {fileID: 2011433807}

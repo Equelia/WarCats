@@ -205,9 +205,12 @@ namespace Units.Logic
                 _ctx.Cts = null;
             }
 
+            UnitEvents.RaiseUnitDied(_ctx.TeamId);
+
             _ = _fsm.SetStateAsync(new Units.Logic.States.DeadState(_ctx));
             Destroy(gameObject, 1f);
         }
+
 
         /// <summary>
         /// Allows external systems to change level at runtime.
