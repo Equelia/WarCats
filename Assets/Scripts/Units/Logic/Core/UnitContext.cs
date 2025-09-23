@@ -1,4 +1,4 @@
-﻿using System.Threading;
+﻿using System;
 using Helpers;
 using Units.Data;
 using UnityEngine;
@@ -30,7 +30,7 @@ namespace Units.Logic.Core
         public Animator Animator;
         public NavMeshAgent Agent;
         public Transform EnemyBase;
-        public CancellationTokenSource Cts;
+        public System.Threading.CancellationTokenSource Cts;
 
         // Runtime stats & state
         public UnitRuntimeStats Stats;
@@ -39,14 +39,19 @@ namespace Units.Logic.Core
         public Vector3 MoveTargetPos;
 
         // Cover ownership & workflow
-        public Cover CurrentCover;           // actually occupied cover
-        public Cover DesiredCover;           // target cover to occupy after reaching nav point
+        public Cover CurrentCover;           
+        public Cover DesiredCover;           
         public float PrevStoppingDistance = -1f;
         public float CoverSearchStartTime = -999f;
 
         // Combat meta
         public float LastAttackTime = -999f;
+        
+        public float RangeBoostOriginal = -1f;
+        public bool HasBaseRangeBoost;
 
+        public bool LockWalkAnim;
+        
         // Lifecycle
         public bool IsInitialized;
 

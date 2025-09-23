@@ -8,27 +8,37 @@ namespace Units.Logic.Services
 		public Transform FindNearestEnemy(UnitContext ctx, float radius)
 		{
 			Collider[] hits = Physics.OverlapSphere(ctx.Transform.position, radius);
-			if (hits == null || hits.Length == 0) return null;
-
 			Transform best = null;
 			float bestDist = float.MaxValue;
 
-			foreach (var c in hits)
+			if (hits != null && hits.Length > 0)
 			{
-				var u = c.GetComponentInParent<UnitController>();
-				if (u == null) continue;
-				if (u.gameObject == ctx.Transform.gameObject) continue;
-				if (u.TeamId == ctx.TeamId) continue;
-
-				float d = Vector3.Distance(ctx.Transform.position, u.transform.position);
-				if (d > radius) continue;
-
-				if (d < bestDist)
+				foreach (var c in hits)
 				{
-					bestDist = d;
-					best = u.transform;
+					var u = c.GetComponentInParent<UnitController>();
+					if (u == null) continue;
+					if (u.gameObject == ctx.Transform.gameObject) continue;
+					if (u.TeamId == ctx.TeamId) continue;
+
+					float d = Vector3.Distance(ctx.Transform.position, u.transform.position);
+					if (d > radius) continue;
+
+					if (d < bestDist)
+					{
+						bestDist = d;
+						best = u.transform;
+					}
 				}
 			}
+
+			// Если врагов нет — вернуть базу как цель, если она в радиусе (без «поблажек»)
+			if (best == null && ctx.EnemyBase != null)
+			{
+				float baseDist = Vector3.Distance(ctx.Transform.position, ctx.EnemyBase.position);
+				if (baseDist <= radius)
+					return ctx.EnemyBase;
+			}
+
 			return best;
 		}
 	}

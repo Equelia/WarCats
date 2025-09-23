@@ -38,8 +38,22 @@ namespace Units.Logic.Services
 			float finalHitChance = ctx.Stats.accuracy * (1f - Mathf.Clamp01(targetVul));
 			bool didHit = Random.value <= finalHitChance;
 
-			if (didHit && targetLogic != null)
-				targetLogic.ReceiveDamage(ctx.Stats.damage);
+			if (didHit)
+			{
+				if (targetLogic != null)
+				{
+					targetLogic.ReceiveDamage(ctx.Stats.damage);
+				}
+				else
+				{
+					// Если цель реализует IDamageable (например, база), нанести урон
+					var damageable = target.GetComponentInParent<IDamageable>();
+					if (damageable != null)
+					{
+						damageable.ApplyDamage(ctx.Stats.damage, ctx.Transform.gameObject);
+					}
+				}
+			}
 
 			OnShotResolvedFx(ctx, target, didHit);
 		}

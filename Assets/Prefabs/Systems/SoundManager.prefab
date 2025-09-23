@@ -1,0 +1,284 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1397453680948207798
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7753248654606752606}
+  - component: {fileID: 2073960154946241466}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7753248654606752606
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397453680948207798}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.6313269, y: 2.2054503, z: 5.3337464}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8983204406892196780}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2073960154946241466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397453680948207798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d4e9b5f37bef87478049bb075b6cd49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultSfxVolumeMultiplier: 1
+  defaultMusicVolumeMultiplier: 1
+  soundEntries:
+  - name: MeadowStep1
+    clip: {fileID: 8300000, guid: 861abd4d8e4d30e4492440602cba9652, type: 3}
+    volume: 0.4
+  - name: MeadowStep2
+    clip: {fileID: 8300000, guid: 3acb274a926e6a94893defd0c3fde9bf, type: 3}
+    volume: 0.4
+  - name: MeadowStep3
+    clip: {fileID: 8300000, guid: bdf9efbdb0033304a8c6c9bf54b130be, type: 3}
+    volume: 0.4
+  - name: MeadowStep4
+    clip: {fileID: 8300000, guid: 05e74473769be1346b28e013d9d8de52, type: 3}
+    volume: 0.4
+  - name: LavaStep
+    clip: {fileID: 8300000, guid: 0ec01b863cefc9e4483111b2da432799, type: 3}
+    volume: 0.4
+  - name: SandStep
+    clip: {fileID: 8300000, guid: eb64e6f7c51176b4b825536ca0221fa6, type: 3}
+    volume: 0.4
+  - name: CauldronCraft
+    clip: {fileID: 8300000, guid: 449d4629422d9504cb76dd790dd3b7ff, type: 3}
+    volume: 0.3
+  - name: CauldronDrop
+    clip: {fileID: 8300000, guid: 0e20a0fe5252d4344944a04a61d507e5, type: 3}
+    volume: 0.16
+  - name: CellPop
+    clip: {fileID: 8300000, guid: e43cf79f92f48954ebf4f23dd85dc33e, type: 3}
+    volume: 0.1
+  - name: JumpSound
+    clip: {fileID: 8300000, guid: c1ffd27926833fb45904728359fcf411, type: 3}
+    volume: 0.2
+  - name: LandSound
+    clip: {fileID: 8300000, guid: 2438821802d40844bb478123a4787568, type: 3}
+    volume: 0.4
+  - name: WaterDeathSound
+    clip: {fileID: 8300000, guid: 88347b50430d7e4439fdf64025d57142, type: 3}
+    volume: 0.5
+  - name: WoodStep
+    clip: {fileID: 8300000, guid: cf42123bad794424593885b3ddd11281, type: 3}
+    volume: 0.4
+  - name: WoodStep2
+    clip: {fileID: 8300000, guid: 5ee3d7a9848bea643afb2e0a299dc2ca, type: 3}
+    volume: 0.4
+  - name: WoodStep3
+    clip: {fileID: 8300000, guid: f55a1324da4f6534fabbfe3c32445528, type: 3}
+    volume: 0.4
+  - name: MushroomJumpPad
+    clip: {fileID: 8300000, guid: a2ed8ae688041e4428aec6fb7cea31ac, type: 3}
+    volume: 0.4
+  - name: MushroomJumpPad2
+    clip: {fileID: 8300000, guid: 2eca8bc2d8208dc4ea03ced374c8d8d8, type: 3}
+    volume: 0.4
+  - name: LevelUp
+    clip: {fileID: 8300000, guid: db3192f8ab9c85549a46c00dfeca5f1e, type: 3}
+    volume: 0.1
+  - name: GoldChange
+    clip: {fileID: 8300000, guid: 6a5b4807ac6eb624a9eea5c8a4130864, type: 3}
+    volume: 0.16
+  - name: Bunny&Wolf
+    clip: {fileID: 8300000, guid: 721f0a15cab35f749b99ae92504ae776, type: 3}
+    volume: 0.2
+  - name: Fish
+    clip: {fileID: 8300000, guid: b8b083b5f60b98d439c1c4f82d58d6c0, type: 3}
+    volume: 0.1
+  - name: Bananas
+    clip: {fileID: 8300000, guid: ec0ca7a2f6f79134596498c5b5d11c3a, type: 3}
+    volume: 0.4
+  - name: Cat
+    clip: {fileID: 8300000, guid: dd8d2216f18955749877a9ccd30bcce0, type: 3}
+    volume: 0.1
+  - name: Bober
+    clip: {fileID: 8300000, guid: 90dcacfe053f27144828f45a1ff6c6f6, type: 3}
+    volume: 0.1
+  - name: GoalCat
+    clip: {fileID: 8300000, guid: b35c2e5833b3b064eb7124628db12a1a, type: 3}
+    volume: 1
+  - name: Business
+    clip: {fileID: 8300000, guid: 6c05c32f0e489494b95299a8bdf06571, type: 3}
+    volume: 0.2
+  - name: InventoryFull
+    clip: {fileID: 8300000, guid: f1650901b7a1f424f8a207c94ecf1373, type: 3}
+    volume: 0.8
+  - name: RiverMan
+    clip: {fileID: 8300000, guid: f9dcd307966216b44bb059d023f10b6e, type: 3}
+    volume: 0.6
+  - name: Gun
+    clip: {fileID: 8300000, guid: 6383a53a1a480a240aafd4f0d7b1235c, type: 3}
+    volume: 0.9
+  - name: Parkour
+    clip: {fileID: 8300000, guid: a3dde3b5ac60c5241a4622ae41da379c, type: 3}
+    volume: 0.9
+  - name: Pivo
+    clip: {fileID: 8300000, guid: 0d50bc69697db904584204dad20b0110, type: 3}
+    volume: 0.6
+  - name: UIButton
+    clip: {fileID: 8300000, guid: d4e3e242570aca345bc8a094c9ec73ee, type: 3}
+    volume: 0.6
+  bgMusicEntries:
+  - name: MeadowLvl
+    clip: {fileID: 8300000, guid: 262ddfc11b0abe64ab452fd4e2f20cb1, type: 3}
+    volume: 0.2
+  - name: CryingForestLvl
+    clip: {fileID: 8300000, guid: 4bf0ff1a00fdc674cb6d935dae00f043, type: 3}
+    volume: 0.2
+  musicSource: {fileID: 3126257551769893453}
+  initialSfxPoolSize: 10
+--- !u!1 &7695549599964030266
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8983204406892196780}
+  - component: {fileID: 3126257551769893453}
+  m_Layer: 0
+  m_Name: BackgroundMusic
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8983204406892196780
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7695549599964030266}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7753248654606752606}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &3126257551769893453
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7695549599964030266}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

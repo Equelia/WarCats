@@ -10,11 +10,9 @@ namespace Units.Logic.Services
     {
         public CoverCandidate? FindBest(UnitContext ctx, Vector3 fromPos, Vector3 enemyPos, float radius)
         {
-            // collect candidates around
             Collider[] hits = Physics.OverlapSphere(fromPos, radius);
             var candidates = new List<Cover>();
 
-            // forward used to exclude "far behind" covers by angle
             Vector3 forward = (ctx.Agent != null ? ctx.Agent.transform.forward : ctx.Transform.forward);
             forward.y = 0f;
             if (forward.sqrMagnitude < 0.0001f)
@@ -133,16 +131,12 @@ namespace Units.Logic.Services
         public bool Occupy(UnitContext ctx, Cover cov)
         {
             if (cov == null) return false;
-
-            // already ours
             if (cov.occupant == ctx.Transform.GetComponent<UnitController>())
             {
                 ctx.CurrentCover = cov;
                 return true;
             }
-
             if (cov.IsOccupied) return false;
-
             cov.occupant = ctx.Transform.GetComponent<UnitController>();
             ctx.CurrentCover = cov;
             return true;

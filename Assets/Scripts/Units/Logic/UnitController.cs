@@ -10,10 +10,6 @@ using Zenject;
 
 namespace Units.Logic
 {
-    /// <summary>
-    /// Thin orchestrator that wires up context, services and FSM states.
-    /// Replace old monolithic UnitLogic with this class.
-    /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     public class UnitController : MonoBehaviour
     {
@@ -25,42 +21,40 @@ namespace Units.Logic
         [SerializeField] protected int teamId = 0;
 
         [Header("Cover")]
-        [Tooltip("How far the unit will search for covers (world units).")]
         public float coverSearchRadius = 6f;
-        [Tooltip("Distance to enemy at which the unit prefers to start seeking cover.")]
         public float coverSeekDistance = 4f;
-        [Tooltip("Exclude covers that are further than this angle behind the unit's forward.")]
         public float coverExcludeAngleDeg = 100f;
 
         [Header("Debug")]
         public bool debugCover = false;
 
         [Inject] protected ITeamBaseProvider baseProvider;
-        
 
-        // Public accessors
         public int TeamId => teamId;
         public UnitContext Context => _ctx;
         public UnitData UnitDataAsset => unitData;
-        
+
         private bool _built;
         private Transform _pendingEnemyBase;
-        
-        // Core
+
         protected UnitContext _ctx;
         protected StateMachine _fsm;
 
-        // Services (can be swapped or injected if desired)
         protected IMovementService _move;
         protected ISensorService _sensor;
         protected ICoverService _cover;
         protected ICombatService _combat;
 
+        [Header("Base Fallback")]
+        [SerializeField] protected bool allowFallbackFireAtBase = true;
+        [SerializeField] protected float baseProbeInterval = 0.2f; // чуть чаще
+        private float _baseProbeTimer;
+
         protected virtual void Awake()
         {
             if (unitData != null && !_built) Build();
         }
-        
+
         private void Build()
         {
             if (_built) return;
@@ -84,7 +78,7 @@ namespace Units.Logic
                 Agent = agent,
                 EnemyBase = _pendingEnemyBase != null
                     ? _pendingEnemyBase
-                    : (baseProvider != null ? baseProvider.GetOpposingBaseTransform(teamId) : null),
+                    : (baseProvider != null ? baseProvider.GetOpposingBaseTransform(teamId) : TryResolveEnemyBase(teamId)),
 
                 Cts = new System.Threading.CancellationTokenSource(),
                 IsInitialized = true
@@ -99,6 +93,10 @@ namespace Units.Logic
             agent.acceleration = 8f;
             agent.updateRotation = true;
             agent.updatePosition = true;
+            agent.autoBraking = false;
+            agent.avoidancePriority = Random.Range(30, 70);
+            agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+            agent.autoRepath = true;
 
             _move = new MovementService();
             _sensor = new SensorService();
@@ -110,13 +108,9 @@ namespace Units.Logic
 
             OnBuilt();
         }
-        
+
         protected virtual void OnBuilt() { }
 
-        /// <summary>
-        /// Finishes construction after Bootstrapper assigns UnitData / sockets.
-        /// Safe to call multiple times.
-        /// </summary>
         public void BootstrapFinalize()
         {
             if(!_built) Build();
@@ -127,7 +121,7 @@ namespace Units.Logic
             level  = Mathf.Clamp(initLevel, 1, 3);
             teamId = team;
             _pendingEnemyBase = explicitEnemyBase;
-            
+
             if (!_built)
             {
                 Build();
@@ -139,9 +133,9 @@ namespace Units.Logic
 
             _ctx.EnemyBase = explicitEnemyBase != null
                 ? explicitEnemyBase
-                : (baseProvider != null ? baseProvider.GetOpposingBaseTransform(teamId) : _ctx.EnemyBase);
+                : (baseProvider != null ? baseProvider.GetOpposingBaseTransform(teamId) : TryResolveEnemyBase(teamId));
         }
-        
+
         private Transform TryResolveEnemyBase(int team)
         {
             if (baseProvider != null)
@@ -150,7 +144,7 @@ namespace Units.Logic
             var provider = Object.FindObjectOfType<TeamBaseProvider>();
             if (provider) return provider.GetOpposingBaseTransform(team);
 
-            var go = GameObject.FindWithTag("EnemyBase");  
+            var go = GameObject.FindWithTag("EnemyBase");
             return go ? go.transform : null;
         }
 
@@ -158,7 +152,6 @@ namespace Units.Logic
 
         protected virtual void OnDestroy()
         {
-            // Release occupied cover if any
             _cover?.Release(_ctx);
 
             if (_ctx?.Cts != null)
@@ -174,13 +167,24 @@ namespace Units.Logic
             if (_ctx == null || !_ctx.IsInitialized) return;
             if (_ctx.CurrentHealth <= 0) return;
 
-            // keep agent speed/stopping synced unless temp override is active
             _ctx.Agent.speed = _ctx.Stats.moveSpeed;
             if (_ctx.PrevStoppingDistance < 0f)
                 _ctx.Agent.stoppingDistance = _ctx.Stats.attackRange;
 
             _fsm.Tick();
+
+            if (allowFallbackFireAtBase && _ctx.EnemyBase != null)
+            {
+                _baseProbeTimer -= Time.deltaTime;
+                if (_baseProbeTimer <= 0f)
+                {
+                    _baseProbeTimer = baseProbeInterval;
+                    TryFallbackFireAtEnemyBase();
+                }
+            }
         }
+
+        protected virtual void TryFallbackFireAtEnemyBase() { }
 
         public virtual void ReceiveDamage(int amount)
         {
@@ -211,13 +215,8 @@ namespace Units.Logic
             Destroy(gameObject, 1f);
         }
 
-
-        /// <summary>
-        /// Allows external systems to change level at runtime.
-        /// </summary>
         public virtual void SetLevel(int newLevel)
         {
-            // keep serialized field in sync so Inspector shows the runtime value
             level = Mathf.Clamp(newLevel, 1, 3);
 
             _ctx.Level = level;
@@ -231,5 +230,4 @@ namespace Units.Logic
             }
         }
     }
-
 }
