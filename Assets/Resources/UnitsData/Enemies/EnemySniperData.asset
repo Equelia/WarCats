@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: EnemySniperData
   m_EditorClassIdentifier: 
   unitName: Sniper
-  spawnCost: 85
-  attackRange: 18
-  attackCooldown: 3
+  spawnCost: 56
+  attackRange: 16
+  attackCooldown: 5
   accuracy: 0.95
   vulnerability: 0.05
-  damage: 25
-  maxHealth: 20
+  damage: 35
+  maxHealth: 30
   moveSpeed: 0.8
   levelModifiers:
   - level: 1
@@ -44,7 +44,7 @@ MonoBehaviour:
     accuracyAdd: 0.02
     damageAdd: 0
     healthAdd: 0
-    moveSpeedMultiplier: 1
+    moveSpeedMultiplier: 1.2
     vulnerabilityAdd: 0
   stockMode: 0
   startingStock: 0

@@ -5,12 +5,18 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Lobby.unity
     guid: 3b3721d125206a340b3571056f11c4ae
-  - enabled: 1
-    path: Assets/Scenes/TownLevel.unity
+  - enabled: 0
+    path: Assets/Scenes/GameLevels/1/TownLevel.unity
     guid: c9b688814126321429bdc88a09161307
+  - enabled: 0
+    path: Assets/Scenes/GameLevels/2/TownLevel.unity
+    guid: 228bce9b834e78a4fad90ee3a53c49b8
+  - enabled: 1
+    path: Assets/Scenes/GameLevels/3/IslandLevel2.unity
+    guid: ceec47d0eed27fe42a3585189178b4ed
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

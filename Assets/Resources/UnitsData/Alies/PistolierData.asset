@@ -14,14 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Pistolier
   spawnCost: 10
-  attackRange: 15
-  attackCooldown: 1
+  attackRange: 10
+  attackCooldown: 1.5
   accuracy: 0.5
   vulnerability: 0.05
-  damage: 5
-  maxHealth: 35
-  moveSpeed: 1
-  levelModifiers: []
+  damage: 10
+  maxHealth: 25
+  moveSpeed: 1.2
+  levelModifiers:
+  - level: 0
+    attackRangeMultiplier: 0
+    attackCooldownMultiplier: 0
+    accuracyAdd: 0
+    damageAdd: 0
+    healthAdd: 0
+    moveSpeedMultiplier: 0
+    vulnerabilityAdd: 0
   stockMode: 2
   startingStock: 3
   maxStock: 5
