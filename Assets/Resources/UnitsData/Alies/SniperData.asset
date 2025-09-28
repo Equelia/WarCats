@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Sniper
   spawnCost: 56
-  attackRange: 16
+  attackRange: 13
   attackCooldown: 5
   accuracy: 0.95
   vulnerability: 0.05

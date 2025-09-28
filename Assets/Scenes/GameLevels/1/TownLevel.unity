@@ -2201,7 +2201,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4014531319739308, guid: 5269390e4b6524b308819ae611fb8441, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 11.81
+      value: 8.75
       objectReference: {fileID: 0}
     - target: {fileID: 4014531319739308, guid: 5269390e4b6524b308819ae611fb8441, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2209,7 +2209,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4014531319739308, guid: 5269390e4b6524b308819ae611fb8441, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.01
+      value: 1.8
       objectReference: {fileID: 0}
     - target: {fileID: 4014531319739308, guid: 5269390e4b6524b308819ae611fb8441, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2592,15 +2592,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4000014163640752, guid: 3ccacde2242aa934f800f035549fe0c8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -22.93
+      value: -20.84
       objectReference: {fileID: 0}
     - target: {fileID: 4000014163640752, guid: 3ccacde2242aa934f800f035549fe0c8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.4429975
+      value: -3.44
       objectReference: {fileID: 0}
     - target: {fileID: 4000014163640752, guid: 3ccacde2242aa934f800f035549fe0c8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.16
+      value: -2.03
       objectReference: {fileID: 0}
     - target: {fileID: 4000014163640752, guid: 3ccacde2242aa934f800f035549fe0c8, type: 3}
       propertyPath: m_LocalRotation.w
@@ -10415,7 +10415,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   teamId: 0
   incomeInterval: 2
-  incomeAmount: 2
+  incomeAmount: 3
   xpPerEnemyKill: 20
   pointsPerLevelUp: 1
   baseXpToLevel: 40

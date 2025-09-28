@@ -20,6 +20,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameLevels/4/IslandLevel2.unity
     guid: 79d9a6fa1222ccb4eb2d4cca6039305d
+  - enabled: 1
+    path: Assets/Scenes/GameLevels/5/4.unity
+    guid: fdd4c74c88f5d9c4ba58053f96aa19bc
+  - enabled: 1
+    path: Assets/Scenes/GameLevels/6/4.unity
+    guid: ccf249c9b3d5d3f43baefa89cff0c3c9
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
