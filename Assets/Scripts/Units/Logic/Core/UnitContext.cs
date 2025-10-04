@@ -28,6 +28,7 @@ namespace Units.Logic.Core
         // Runtime references
         public Transform Transform;
         public Animator Animator;
+        public AudioSource AudioSource;
         public NavMeshAgent Agent;
         public Transform EnemyBase;
         public System.Threading.CancellationTokenSource Cts;

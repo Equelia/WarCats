@@ -23,6 +23,9 @@ public class UnitArchetype : ScriptableObject
 	[Tooltip("Base controller with shared states (Idle, Walk, Shoot, Death, etc).")]
 	public RuntimeAnimatorController baseController;
 
+	[Header("Sound")]
+	public AudioClip shootClip;
+
 	[Tooltip("Optional override that replaces only some clips (e.g., Walk/Shoot for pistol).")]
 	public AnimatorOverrideController overrideController;
 }

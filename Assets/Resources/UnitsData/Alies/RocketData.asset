@@ -18,7 +18,7 @@ MonoBehaviour:
   attackCooldown: 8
   accuracy: 1
   vulnerability: 0.1
-  damage: 40
+  damage: 35
   maxHealth: 35
   moveSpeed: 0.8
   levelModifiers:
@@ -50,6 +50,6 @@ MonoBehaviour:
   startingStock: 0
   maxStock: 1
   rechargeCooldown: 10
-  splashRadius: 2.5
-  rocketSpeed: 25
+  splashRadius: 1.5
+  rocketSpeed: 15
   spawnCountPerSlot: 010000000100000002000000
