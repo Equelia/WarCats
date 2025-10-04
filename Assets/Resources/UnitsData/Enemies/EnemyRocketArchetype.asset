@@ -19,4 +19,5 @@ MonoBehaviour:
   logicKind: 3
   unitData: {fileID: 11400000, guid: db07163f73e51d64a81a8a1b71d1e26e, type: 2}
   baseController: {fileID: 9100000, guid: b22f09821764bc1459b0b27c12add418, type: 2}
+  shootClip: {fileID: 8300000, guid: 289ad669e8e70ef44a2a87ddbc1d694b, type: 3}
   overrideController: {fileID: 0}
