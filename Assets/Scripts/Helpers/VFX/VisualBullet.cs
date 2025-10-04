@@ -6,6 +6,8 @@ public class VisualBullet : MonoBehaviour
 {
     [SerializeField] private float speed = 45f;
     [SerializeField] private Vector3 localRotationOffsetEuler = Vector3.zero;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip audioClip;
 
     private Quaternion _localRotOffset;
     private Vector3 _dir;
@@ -52,6 +54,8 @@ public class VisualBullet : MonoBehaviour
             float dist = to.magnitude;
             if (dist <= speed * dt)
             {
+                if (audioSource != null && audioClip != null)
+                    audioSource.PlayOneShot(audioClip);
                 transform.position = _end;
                 var cb = _onArrive; _onArrive = null;
                 cb?.Invoke();

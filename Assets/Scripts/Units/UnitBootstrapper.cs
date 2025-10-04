@@ -60,13 +60,16 @@ public class UnitBootstrapper : MonoBehaviour
 		_logic = AttachLogicComponent(archetype.logicKind);
 		if (_logic == null) return null;
 
+        if (archetype.shootClip != null)
+            _logic.shootClip = archetype.shootClip;
+
 		// 4) Data
 		AssignUnitData(_logic, archetype.unitData);
 
 		// 5) VFX / sockets
 		AutoWireVFX(_logic, archetype.logicKind);
 
-		_logic.coverSearchRadius = 6f;
+        _logic.coverSearchRadius = 6f;
 		_logic.coverSeekDistance = 10f;
 		_logic.coverExcludeAngleDeg = 100f;
 

@@ -14,7 +14,7 @@ namespace Units.Logic
 		public GameObject muzzleSmokeInstance;
 		public Transform firePoint;
 
-		[Header("Common Targeting")] public Vector3 targetOffset = new Vector3(0f, 1.2f, 0f);
+        [Header("Common Targeting")] public Vector3 targetOffset = new Vector3(0f, 1.2f, 0f);
 		public LayerMask hitMask = ~0;
 
 		// Параметры «наглого» проталкивания
@@ -58,6 +58,8 @@ namespace Units.Logic
 
 		internal void PlayMuzzleFx()
 		{
+			if (shootClip != null)
+				_ctx.AudioSource.PlayOneShot(shootClip);
 			_muzzleFx?.Play();
 			_muzzleSmokeFx?.Play();
 		}

@@ -20,6 +20,8 @@ namespace Units.Logic
         [SerializeField, Range(1,3)] protected int level = 1;
         [SerializeField] protected int teamId = 0;
 
+        [Header("Sound")] public AudioClip shootClip;
+
         [Header("Cover")]
         public float coverSearchRadius = 6f;
         public float coverSeekDistance = 4f;
@@ -61,6 +63,7 @@ namespace Units.Logic
             _built = true;
 
             var agent = GetComponent<NavMeshAgent>();
+            var audioSource = GetComponent<AudioSource>();
             var animator = GetComponentInChildren<Animator>();
 
             _ctx = new UnitContext
@@ -76,6 +79,7 @@ namespace Units.Logic
                 Transform = transform,
                 Animator = animator,
                 Agent = agent,
+                AudioSource = audioSource,
                 EnemyBase = _pendingEnemyBase != null
                     ? _pendingEnemyBase
                     : (baseProvider != null ? baseProvider.GetOpposingBaseTransform(teamId) : TryResolveEnemyBase(teamId)),
