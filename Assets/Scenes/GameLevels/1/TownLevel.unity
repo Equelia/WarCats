@@ -13544,7 +13544,7 @@ AudioSource:
   m_GameObject: {fileID: 1812192469}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -2213433722531081220, guid: 7765d0c0a02c95b46a9702faa61b98a5, type: 2}
   m_audioClip: {fileID: 8300000, guid: bb6a23b4df8bc744784ba21b1a59823c, type: 3}
   m_Resource: {fileID: 8300000, guid: bb6a23b4df8bc744784ba21b1a59823c, type: 3}
   m_PlayOnAwake: 1
@@ -15152,6 +15152,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 272577319986698673, guid: 2fc282d2ae2da464e9149da3cf112515, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 272577319986698673, guid: 2fc282d2ae2da464e9149da3cf112515, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 272577319986698673, guid: 2fc282d2ae2da464e9149da3cf112515, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2931929235137454537, guid: 2fc282d2ae2da464e9149da3cf112515, type: 3}
       propertyPath: m_LocalPosition.x
       value: 6.44
@@ -15190,6 +15202,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2931929235137454537, guid: 2fc282d2ae2da464e9149da3cf112515, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674341883823892666, guid: 2fc282d2ae2da464e9149da3cf112515, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3674341883823892666, guid: 2fc282d2ae2da464e9149da3cf112515, type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4849193271833593631, guid: 2fc282d2ae2da464e9149da3cf112515, type: 3}
@@ -15235,6 +15255,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2181528748609789311, guid: 24dc05b1d873e3b4bb6164760e30734a, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2181528748609789311, guid: 24dc05b1d873e3b4bb6164760e30734a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5655799633326715148, guid: 24dc05b1d873e3b4bb6164760e30734a, type: 3}
       propertyPath: m_LocalPosition.x
       value: -42.44

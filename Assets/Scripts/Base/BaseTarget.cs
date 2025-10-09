@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
 public class BaseTarget : MonoBehaviour, IDamageable
@@ -30,6 +31,9 @@ public class BaseTarget : MonoBehaviour, IDamageable
     private ParticleSystem[] _sparkSystems;
     private bool _stage25On, _stage50On, _stage75On, _dead;
 
+    public event Action<float> OnHealthChanged;
+
+
     private void Awake()
     {
         if (autoDetectTeamByTag && teamId < 0)
@@ -53,6 +57,7 @@ public class BaseTarget : MonoBehaviour, IDamageable
 
         currentHealth -= Mathf.Max(1, amount);
         if (currentHealth < 0) currentHealth = 0;
+        OnHealthChanged?.Invoke(currentHealth);
 
         if (hitVfx) VfxPlayer.SpawnOneShot(hitVfx, transform.position, Quaternion.identity);
 
