@@ -188,6 +188,9 @@ public class UnitSummonController : MonoBehaviour
 		}
 
 		int levelToUse = Mathf.Max(1, levelOverride > 0 ? levelOverride : _army.State.level); 
+		if (teamId == 0)
+			levelToUse = slotLevel;
+		
 		int count = Mathf.Max(1, _unitData.GetSpawnCountForLevel(levelToUse));
 
 		var enemyBase = (_baseProvider != null) ? _baseProvider.GetOpposingBaseTransform(teamId) : null;
@@ -199,9 +202,6 @@ public class UnitSummonController : MonoBehaviour
 		{
 			float ang = (count == 1) ? 0f : (Mathf.PI * 2f * i) / count;
 			Vector3 offset = new Vector3(Mathf.Cos(ang), 0f, Mathf.Sin(ang)) * spread;
-
-			if (teamId == 0)
-				levelToUse = slotLevel;
 			
 			members[i] = _spawner.Spawn(_archetype, teamId, levelToUse, // УРОВЕНРЬ ТУТА
 				pos + offset, rot, enemyBase);
