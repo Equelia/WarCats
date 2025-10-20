@@ -1,14 +1,24 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using TMPro;
 using Units.Data;
 using Units.Logic;
 using UnityEngine;
+using UnityEngine.UI;
+using Zenject;
 
 [DisallowMultipleComponent]
 public class UnitSummonController : MonoBehaviour
 {
+	private int slotLevel = 1;
+	[SerializeField] private Button upgradeButton;
+	[SerializeField] private TMP_Text levelText;
+	[SerializeField] private int maxLevel = 3;
+	
 	public int teamId = 0;
 	public int levelOverride = 0;
+
+
 
 	[Header("Spawn config")] public Transform spawnPoint;
 	public SpawnAreaBase[] spawnAreas;
@@ -117,6 +127,26 @@ public class UnitSummonController : MonoBehaviour
 
 		_configured = true;
 		RaiseStock();
+		
+		if(upgradeButton != null)
+		{
+			upgradeButton.onClick.AddListener(HandleUpgradeBtnClick);
+			ChangeLevelText();
+		}
+	}
+
+	private void HandleUpgradeBtnClick()
+	{
+		if(slotLevel < maxLevel && _army.TrySpendPoints(1))
+		{
+			slotLevel++;
+			ChangeLevelText();
+		}
+	}
+
+	private void ChangeLevelText()
+	{
+		levelText.text = slotLevel.ToString();
 	}
 
 	public bool CanSummon =>
@@ -157,7 +187,7 @@ public class UnitSummonController : MonoBehaviour
 			return false;
 		}
 
-		int levelToUse = Mathf.Max(1, levelOverride > 0 ? levelOverride : _army.State.level);
+		int levelToUse = Mathf.Max(1, levelOverride > 0 ? levelOverride : _army.State.level); 
 		int count = Mathf.Max(1, _unitData.GetSpawnCountForLevel(levelToUse));
 
 		var enemyBase = (_baseProvider != null) ? _baseProvider.GetOpposingBaseTransform(teamId) : null;
@@ -170,7 +200,10 @@ public class UnitSummonController : MonoBehaviour
 			float ang = (count == 1) ? 0f : (Mathf.PI * 2f * i) / count;
 			Vector3 offset = new Vector3(Mathf.Cos(ang), 0f, Mathf.Sin(ang)) * spread;
 
-			members[i] = _spawner.Spawn(_archetype, teamId, levelToUse,
+			if (teamId == 0)
+				levelToUse = slotLevel;
+			
+			members[i] = _spawner.Spawn(_archetype, teamId, levelToUse, // УРОВЕНРЬ ТУТА
 				pos + offset, rot, enemyBase);
 
 			if (!members[i])

@@ -169,7 +169,7 @@ public class ArmyEconomy : MonoBehaviour, IArmyEconomy
         OnStateChanged?.Invoke();
     }
 
-    public bool TrySpendPoints(int amount)
+    public bool TrySpendPoints(int amount) // СЮДА ХОЧУ
     {
         if (amount <= 0) return true;
         if (State.points < amount) return false;
