@@ -95,7 +95,7 @@ public class CameraController : MonoBehaviour
 
     private void Awake()
     {
-        _cam = GetComponent<Camera>();
+       _cam = GetComponent<Camera>();
         if (_cam == null) _cam = Camera.main;
 
         // Clamp and seed zoom targets

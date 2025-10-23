@@ -12,6 +12,7 @@ public class GameOverUI : MonoBehaviour
     [SerializeField] private GameObject finalRoot;   // объект 'Final' (не обязательно)
     [SerializeField] private GameObject losePanel;   // Final/LOSE
     [SerializeField] private GameObject winPanel;    // Final/Win
+    [SerializeField] private GameObject nextLevelButton;
 
     [Header("Teams / Flow")]
     [Tooltip("ID команды игрока (для определения победы при OnGameOver).")]
@@ -33,6 +34,10 @@ public class GameOverUI : MonoBehaviour
         SetActiveSafe(losePanel, false);
         SetActiveSafe(winPanel,  false);
         SetActiveSafe(finalRoot, false);
+        if(SceneManager.GetActiveScene().buildIndex >= SceneManager.sceneCountInBuildSettings -1)
+        {
+            nextLevelButton.SetActive(false);
+        }
     }
 
     private void OnEnable()
@@ -92,6 +97,16 @@ public class GameOverUI : MonoBehaviour
 
         SceneManager.LoadScene(menuSceneName);
     }
+    public void OnNextLevelPressed()
+
+    {
+        UnpauseIfNeeded();
+
+        if (useCustomLoaderIfAvailable && TryUseCustomLoader(menuSceneName))
+            return;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
 
     /// <summary>Выход из игры (кнопки: LOSE/Leave, Win/Leave).</summary>
     public void OnQuitPressed()
