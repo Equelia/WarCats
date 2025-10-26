@@ -105,6 +105,9 @@ public class UnitBootstrapper : MonoBehaviour
 			case UnitArchetype.LogicKind.Shield:
 				logic = GetComponent<ShieldLogic>() ?? gameObject.AddComponent<ShieldLogic>();
 				break;
+			case UnitArchetype.LogicKind.Dogs:
+				logic = GetComponent<DogsLogic>() ?? gameObject.AddComponent<DogsLogic>();
+				break;
 		}
 
 		if (logic) logic.enabled = true;
@@ -123,6 +126,8 @@ public class UnitBootstrapper : MonoBehaviour
 		if (r) r.enabled = false;
 		var sh = GetComponent<ShieldLogic>();
 		if (sh) sh.enabled = false;
+		var d = GetComponent<DogsLogic>();
+		if (d) d.enabled = false;
 	}
 
 	private static void AssignUnitData(UnitController ctrl, UnitData data)
@@ -207,6 +212,17 @@ public class UnitBootstrapper : MonoBehaviour
 	{
 		GameObject FindGO(string token) =>
 			FindFirstTransformByNames(transform, token)?.gameObject;
+		
+		var goSpawn = FindGO("vfxSpawn") ?? vfxSpawn;
+		TryAssign(ctrl, "spawnVfxPrefab", goSpawn);
+
+		
+		if (kind == UnitArchetype.LogicKind.Dogs)
+		{
+			// still push firePoint if your logic expects Transform to exist; harmless otherwise
+			TryAssign(ctrl, "firePoint", firePoint);
+			return;
+		}
 
 		var goProjectile = FindGO("vfxProjectile") ?? defaultProjectilePrefab;
 		var goHitEnemy = FindGO("vfxImpactUnit") ?? vfxImpactUnit;
@@ -214,7 +230,6 @@ public class UnitBootstrapper : MonoBehaviour
 
 		var goMuzzleFlash = this.muzzleFlashInstance ?? FindGO("muzzleFlashInstance") ?? vfxMuzzleFlash;
 		var goMuzzleSmoke = this.muzzleSmokeInstance ?? FindGO("muzzleSmokeInstance") ?? vfxMuzzleSmoke;
-		var goSpawn = FindGO("vfxSpawn") ?? vfxSpawn;
 
 		// --- Rocket overrides ---
 		if (kind == UnitArchetype.LogicKind.Rocket)
@@ -232,8 +247,6 @@ public class UnitBootstrapper : MonoBehaviour
 		if (goHitEnv) TryAssign(ctrl, "hitEnvVfxPrefab", goHitEnv);
 		TryAssign(ctrl, "muzzleFlashInstance", goMuzzleFlash);
 		TryAssign(ctrl, "muzzleSmokeInstance", goMuzzleSmoke);
-		TryAssign(ctrl, "spawnVfxPrefab", goSpawn);
-
 		TryAssign(ctrl, "firePoint", firePoint);
 	}
 

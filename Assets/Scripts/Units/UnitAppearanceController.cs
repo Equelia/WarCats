@@ -2,189 +2,242 @@
 using UnityEngine;
 
 /// <summary>
-/// Модульная кастомизация без префабов: включает нужные дочерние варианты Body/Head/Weapon
-/// и красит только активное Body через MaterialPropertyBlock.
+/// Modular appearance toggle: enables desired Body/Head/Weapon variants
+/// and tints only the active Body via MaterialPropertyBlock.
+/// Also selects the correct Animator: UnitVisuals animator for regular units,
+/// and DogBones animator for dogs.
 /// </summary>
 [DisallowMultipleComponent]
 public class UnitAppearanceToggle : MonoBehaviour
 {
-    public enum UnitKind { Pistol, Automata, Sniper, Rocket, Shield, CatGirl }
-    public enum Team     { Ally, Enemy }
+	public enum UnitKind { Pistol, Automata, Sniper, Rocket, Shield, Dog, CatGirl }
+	public enum Team { Ally, Enemy }
 
-    [Header("Variant Roots (parents that contain child variants)")]
-    public Transform bodyRoot;   // содержит детей: Body_pistol, Body_sniper, ...
-    public Transform headRoot;   // содержит детей: Head_pistol, Head_sniper, Head_Fox, ...
-    public Transform weaponRoot; // содержит детей: Pistol, Sniper, Rocket, ...
+	[Header("Variant Roots (parents that contain child variants)")]
+	public Transform bodyRoot;
+	public Transform headRoot;
+	public Transform weaponRoot;
 
-    [Header("Name keys (matched by Contains, case-insensitive)")]
-    [Tooltip("Префикс для детей тела (например Body_)")]
-    public string bodyKeyPrefix   = "Body_";
-    [Tooltip("Префикс для детей головы (например Head_)")]
-    public string headKeyPrefix   = "Head_";
-    [Tooltip("Префикс для детей оружия (можно пусто если имена 'Pistol', 'Sniper', ...)")]
-    public string weaponKeyPrefix = "";
+	[Header("Name keys (matched by Contains, case-insensitive)")]
+	public string bodyKeyPrefix   = "Body_";
+	public string headKeyPrefix   = "Head_";
+	public string weaponKeyPrefix = "";
 
-    [Header("Enemy head override (optional)")]
-    [Tooltip("Если true — у врага всегда включаем enemyHeadKey (например, Head_Fox)")]
-    public bool useEnemyDefaultHead = true;
-    public string enemyHeadKey      = "Head_Fox";
+	[Header("Enemy head override (optional)")]
+	public bool   useEnemyDefaultHead = true;
+	public string enemyHeadKey        = "Head_Fox";
 
-    [Header("Body tint")]
-    public Color allyBodyColor  = new Color(0.25f, 0.7f, 1f);
-    public Color enemyBodyColor = new Color(1f, 0.35f, 0.35f);
+	[Header("Body tint")]
+	public Color  allyBodyColor  = new Color(0.25f, 0.7f, 1f);
+	public Color  enemyBodyColor = new Color(1f, 0.35f, 0.35f);
+	public string colorPropertyName = "_BaseColor";
 
-    [Tooltip("URP Lit: _BaseColor, Built-in Standard: _Color")]
-    public string colorPropertyName = "_BaseColor";
+	[Header("Animators")]
+	[Tooltip("Animator that lives on UnitVisuals (used by regular humanoids). If empty, will be auto-found on this GameObject.")]
+	[SerializeField] private Animator unitVisualsAnimator;
 
-    // ---- runtime ----
-    private GameObject _activeBody;
-    private GameObject _activeHead;
-    private GameObject _activeWeapon;
+	// ---- runtime ----
+	private GameObject _activeBody;
+	private GameObject _activeHead;
+	private GameObject _activeWeapon;
 
-    private readonly List<Renderer> _bodyRenderers = new();
-    private MaterialPropertyBlock _mpb;
-    private int _colorId;
+	private readonly List<Renderer> _bodyRenderers = new();
+	private MaterialPropertyBlock _mpb;
+	private int _colorId;
 
-    // ====================== PUBLIC API ======================
+	private void Awake()
+	{
+		// Auto-cache UnitVisuals animator if not assigned
+		if (!unitVisualsAnimator) unitVisualsAnimator = GetComponent<Animator>();
+	}
 
-    /// <summary>Применить лоадаут по типу и команде.</summary>
-    public void ApplyLoadout(UnitKind kind, Team team)
-    {
-        // BODY
-        _activeBody = ActivateByKey(bodyRoot, BuildBodyKey(kind));
-        CacheBodyRenderers();
+	/// <summary>Apply loadout by kind and team.</summary>
+	public void ApplyLoadout(UnitKind kind, Team team)
+	{
+		// BODY
+		_activeBody = ActivateByKey(bodyRoot, BuildBodyKey(kind));
+		CacheBodyRenderers();
 
-        // HEAD (для врага можно принудительно включить фиксированную голову)
-        string headKey = (team == Team.Enemy && useEnemyDefaultHead && !string.IsNullOrEmpty(enemyHeadKey))
-            ? enemyHeadKey
-            : BuildHeadKey(kind);
-        _activeHead = ActivateByKey(headRoot, headKey);
+		// DOG: full model is in Body; disable Head/Weapon completely
+		if (kind == UnitKind.Dog)
+		{
+			DeactivateAllChildren(headRoot);
+			_activeHead = null;
 
-        // WEAPON
-        _activeWeapon = ActivateByKey(weaponRoot, BuildWeaponKey(kind));
+			DeactivateAllChildren(weaponRoot);
+			_activeWeapon = null;
 
-        // COLOR (только Body)
-        SetBodyColor(team == Team.Ally ? allyBodyColor : enemyBodyColor);
-    }
+			SetBodyColor(team == Team.Ally ? allyBodyColor : enemyBodyColor);
 
-    /// <summary>Поставить цвет тела вручную (например, уникальная окраска).</summary>
-    public void SetBodyColor(Color color)
-    {
-        if (_colorId == 0) _colorId = Shader.PropertyToID(colorPropertyName);
-        if (_mpb == null) _mpb = new MaterialPropertyBlock();
+			// Select Dog animator on DogBones
+			EnableCorrectAnimator(kind);
+			return;
+		}
 
-        foreach (var r in _bodyRenderers)
-        {
-            if (!r) continue;
-            r.GetPropertyBlock(_mpb);
-            _mpb.SetColor(_colorId, color);
-            // На всякий случай ещё и _Color поддержим (Built-in Standard)
-            _mpb.SetColor(Shader.PropertyToID("_Color"), color);
-            r.SetPropertyBlock(_mpb);
-        }
-    }
+		// Regular units: select Head/Weapon by key
+		string headKey = (team == Team.Enemy && useEnemyDefaultHead && !string.IsNullOrEmpty(enemyHeadKey))
+			? enemyHeadKey
+			: BuildHeadKey(kind);
+		_activeHead = ActivateByKey(headRoot, headKey);
 
-    /// <summary>Включить явного ребёнка тела по части имени (быстрая ручная подмена).</summary>
-    public void SetBodyByKey(string key)
-    {
-        _activeBody = ActivateByKey(bodyRoot, key);
-        CacheBodyRenderers();
-    }
+		_activeWeapon = ActivateByKey(weaponRoot, BuildWeaponKey(kind));
 
-    /// <summary>Включить явного ребёнка головы по части имени.</summary>
-    public void SetHeadByKey(string key) => _activeHead = ActivateByKey(headRoot, key);
+		SetBodyColor(team == Team.Ally ? allyBodyColor : enemyBodyColor);
 
-    /// <summary>Включить явного ребёнка оружия по части имени.</summary>
-    public void SetWeaponByKey(string key) => _activeWeapon = ActivateByKey(weaponRoot, key);
+		// Select UnitVisuals animator for non-dog units
+		EnableCorrectAnimator(kind);
+	}
 
-    // ====================== INTERNALS ======================
+	public void SetBodyColor(Color color)
+	{
+		if (_colorId == 0) _colorId = Shader.PropertyToID(colorPropertyName);
+		if (_mpb == null) _mpb = new MaterialPropertyBlock();
 
-    private string BuildBodyKey(UnitKind kind)   => bodyKeyPrefix   + NameKey(kind);
-    private string BuildHeadKey(UnitKind kind)   => headKeyPrefix   + NameKey(kind);
-    private string BuildWeaponKey(UnitKind kind) => weaponKeyPrefix + WeaponNameKey(kind);
+		foreach (var r in _bodyRenderers)
+		{
+			if (!r) continue;
+			r.GetPropertyBlock(_mpb);
+			_mpb.SetColor(_colorId, color);
+			_mpb.SetColor(Shader.PropertyToID("_Color"), color); // Built-in fallback
+			r.SetPropertyBlock(_mpb);
+		}
+	}
 
-    // Подбираем ключи под ожидаемые имена детей в твоём проекте
-    private string NameKey(UnitKind k)
-    {
-        switch (k)
-        {
-            case UnitKind.Pistol:   return "pistol";
-            case UnitKind.Sniper:   return "sniper";
-            case UnitKind.Rocket:   return "rocket";
-            case UnitKind.Automata: return "automata";
-            case UnitKind.CatGirl:  return "CatGirl"; // в ассетах с заглавной — оставим именно так
-            default:                return k.ToString();
-        }
-    }
+	public void SetBodyByKey(string key)
+	{
+		_activeBody = ActivateByKey(bodyRoot, key);
+		CacheBodyRenderers();
+	}
 
-    private string WeaponNameKey(UnitKind k)
-    {
-        // У оружия обычно без префикса: "Pistol", "Sniper", "Rocket", "Automata"
-        switch (k)
-        {
-            case UnitKind.Pistol:   return "Pistol";
-            case UnitKind.Sniper:   return "Sniper";
-            case UnitKind.Rocket:   return "Rocket";
-            case UnitKind.Automata: return "Automata";
-            case UnitKind.CatGirl:  return "Pistol";   // если для CatGirl тоже пистолет — подстрой при нужде
-            default:                return k.ToString();
-        }
-    }
+	public void SetHeadByKey(string key)   => _activeHead   = ActivateByKey(headRoot, key);
+	public void SetWeaponByKey(string key) => _activeWeapon = ActivateByKey(weaponRoot, key);
 
-    /// <summary>
-    /// Активирует единственного ребёнка чьё имя содержит key (регистронезависимо),
-    /// все остальные выключает. Возвращает активированный объект (или null).
-    /// </summary>
-    private GameObject ActivateByKey(Transform root, string key)
-    {
-        if (!root)
-        {
-            Debug.LogError("[UnitAppearanceToggle] Root is not assigned.", this);
-            return null;
-        }
-        if (string.IsNullOrEmpty(key))
-        {
-            Debug.LogWarning("[UnitAppearanceToggle] Empty key.", this);
-            return null;
-        }
+	// ============== Internals ==============
 
-        GameObject activated = null;
-        string keyLower = key.ToLowerInvariant();
+	private string BuildBodyKey(UnitKind kind)   => bodyKeyPrefix   + NameKey(kind);
+	private string BuildHeadKey(UnitKind kind)   => headKeyPrefix   + NameKey(kind);
+	private string BuildWeaponKey(UnitKind kind) => weaponKeyPrefix + WeaponNameKey(kind);
 
-        for (int i = 0; i < root.childCount; i++)
-        {
-            var child = root.GetChild(i).gameObject;
-            bool match = child.name.ToLowerInvariant().Contains(keyLower);
-            child.SetActive(match);
-            if (match) activated = child;
-        }
+	private string NameKey(UnitKind k)
+	{
+		switch (k)
+		{
+			case UnitKind.Pistol:   return "pistol";
+			case UnitKind.Sniper:   return "sniper";
+			case UnitKind.Rocket:   return "rocket";
+			case UnitKind.Automata: return "automata";
+			case UnitKind.CatGirl:  return "CatGirl";
+			case UnitKind.Dog:      return "Dog";
+			default:                return k.ToString();
+		}
+	}
 
-        if (activated == null)
-        {
-            Debug.LogWarning($"[UnitAppearanceToggle] No child under '{root.name}' matched key '{key}'.", this);
-        }
+	private string WeaponNameKey(UnitKind k)
+	{
+		switch (k)
+		{
+			case UnitKind.Pistol:   return "Pistol";
+			case UnitKind.Sniper:   return "Sniper";
+			case UnitKind.Rocket:   return "Rocket";
+			case UnitKind.Automata: return "Automata";
+			case UnitKind.CatGirl:  return "Pistol";
+			case UnitKind.Dog:      return ""; // unused for dogs
+			default:                return k.ToString();
+		}
+	}
 
-        return activated;
-    }
+	/// <summary>
+	/// Activates a single child whose name contains 'key' (case-insensitive),
+	/// deactivates others, and returns the activated object (or null).
+	/// </summary>
+	private GameObject ActivateByKey(Transform root, string key)
+	{
+		if (!root)
+		{
+			Debug.LogError("[UnitAppearanceToggle] Root is not assigned.", this);
+			return null;
+		}
+		if (string.IsNullOrEmpty(key))
+		{
+			DeactivateAllChildren(root);
+			return null;
+		}
 
-    private void CacheBodyRenderers()
-    {
-        _bodyRenderers.Clear();
-        if (_activeBody == null) return;
+		GameObject activated = null;
+		string keyLower = key.ToLowerInvariant();
 
-        // Соберём все виды Renderer (MeshRenderer / SkinnedMeshRenderer и т.п.)
-        var tmp = _activeBody.GetComponentsInChildren<Renderer>(true);
-        _bodyRenderers.AddRange(tmp);
-    }
+		for (int i = 0; i < root.childCount; i++)
+		{
+			var child = root.GetChild(i).gameObject;
+			bool match = child.name.ToLowerInvariant().Contains(keyLower);
+			child.SetActive(match);
+			if (match) activated = child;
+		}
+
+		if (activated == null)
+			Debug.LogWarning($"[UnitAppearanceToggle] No child under '{root.name}' matched key '{key}'.", this);
+
+		return activated;
+	}
+
+	private static void DeactivateAllChildren(Transform root)
+	{
+		if (!root) return;
+		for (int i = 0; i < root.childCount; i++)
+			root.GetChild(i).gameObject.SetActive(false);
+	}
+
+	private void CacheBodyRenderers()
+	{
+		_bodyRenderers.Clear();
+		if (_activeBody == null) return;
+		var tmp = _activeBody.GetComponentsInChildren<Renderer>(true);
+		_bodyRenderers.AddRange(tmp);
+	}
+
+	/// <summary>
+	/// Enables the proper Animator:
+	/// - For regular units: enable UnitVisuals animator
+	/// - For Dog: enable Animator found under the active body (DogBones), disable others.
+	/// </summary>
+	private void EnableCorrectAnimator(UnitKind kind)
+	{
+		// Disable all animators under UnitVisuals tree first
+		var all = GetComponentsInChildren<Animator>(true);
+		foreach (var a in all) a.enabled = false;
+
+		if (kind == UnitKind.Dog)
+		{
+			// Find any animator under the active dog body (DogBones) and enable it
+			if (_activeBody)
+			{
+				var dogAnimator = _activeBody.GetComponentInChildren<Animator>(true);
+				if (dogAnimator) dogAnimator.enabled = true;
+				else Debug.LogWarning("[UnitAppearanceToggle] Dog body has no Animator (DogBones)?", this);
+			}
+			else
+			{
+				Debug.LogWarning("[UnitAppearanceToggle] Active dog body is null.", this);
+			}
+		}
+		else
+		{
+			// Enable UnitVisuals animator (humanoid rig)
+			if (!unitVisualsAnimator) unitVisualsAnimator = GetComponent<Animator>();
+			if (unitVisualsAnimator) unitVisualsAnimator.enabled = true;
+			else Debug.LogWarning("[UnitAppearanceToggle] UnitVisuals Animator not found.", this);
+		}
+	}
 
 #if UNITY_EDITOR
-    [ContextMenu("Auto-Find Roots By Name")]
-    private void AutoFindRoots()
-    {
-        if (!bodyRoot)   bodyRoot   = transform.Find("BodyRoot")   ?? transform.Find("Body");
-        if (!headRoot)   headRoot   = transform.Find("HeadRoot")   ?? transform.Find("Head");
-        if (!weaponRoot) weaponRoot = transform.Find("WeaponRoot") ?? transform.Find("Weapon");
-        Debug.Log("[UnitAppearanceToggle] Auto-find complete.", this);
-    }
+	[ContextMenu("Auto-Find Roots By Name")]
+	private void AutoFindRoots()
+	{
+		if (!bodyRoot)   bodyRoot   = transform.Find("BodyRoot")   ?? transform.Find("Body")   ?? transform.Find("UnitVisuals/BodySocket");
+		if (!headRoot)   headRoot   = transform.Find("HeadRoot")   ?? transform.Find("Head")   ?? transform.Find("UnitVisuals/HeadSocket");
+		if (!weaponRoot) weaponRoot = transform.Find("WeaponRoot") ?? transform.Find("Weapon") ?? transform.Find("UnitVisuals/WeaponSocket");
+		if (!unitVisualsAnimator) unitVisualsAnimator = GetComponent<Animator>();
+		Debug.Log("[UnitAppearanceToggle] Auto-find complete.", this);
+	}
 #endif
 }

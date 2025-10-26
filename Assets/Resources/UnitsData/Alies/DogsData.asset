@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5dfb7a9f86b4884a0d0156cb26d91f2, type: 3}
+  m_Name: DogsData
+  m_EditorClassIdentifier: 
+  unitName: Dogs
+  spawnCost: 20
+  attackRange: 1
+  attackCooldown: 1
+  accuracy: 1
+  vulnerability: 0
+  damage: 2
+  maxHealth: 20
+  moveSpeed: 2.5
+  levelModifiers:
+  - level: 1
+    attackRangeMultiplier: 0
+    attackCooldownMultiplier: 0
+    accuracyAdd: 0
+    damageAdd: 0
+    healthAdd: 0
+    moveSpeedMultiplier: 0
+    vulnerabilityAdd: 0
+  - level: 2
+    attackRangeMultiplier: 0
+    attackCooldownMultiplier: 0
+    accuracyAdd: 0
+    damageAdd: 1
+    healthAdd: 10
+    moveSpeedMultiplier: 0
+    vulnerabilityAdd: 0
+  - level: 3
+    attackRangeMultiplier: 0
+    attackCooldownMultiplier: 0
+    accuracyAdd: 0
+    damageAdd: 0
+    healthAdd: 0
+    moveSpeedMultiplier: 0
+    vulnerabilityAdd: 0
+  stockMode: 2
+  startingStock: 0
+  maxStock: 2
+  rechargeCooldown: 10
+  packCountPerLevel: 020000000300000004000000
+  biteSfx: {fileID: 8300000, guid: 3bbc34cd51efc554fbc0659ed87a85c0, type: 3}
+  biteVfx: {fileID: 8965377632537913298, guid: a7230d708df11f546a392f0b854bf826, type: 3}
+  biteNudgeForce: 0
