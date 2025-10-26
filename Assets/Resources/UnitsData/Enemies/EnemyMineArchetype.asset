@@ -17,7 +17,7 @@ MonoBehaviour:
   enemyUsesFixedHead: 0
   enemyHeadKey: Head_Fox
   logicKind: 6
-  unitData: {fileID: 11400000, guid: ac03e41e243a44d49a71990d496335ad, type: 2}
+  unitData: {fileID: 11400000, guid: 415a0fa6ec22a5d47a818a8b426672af, type: 2}
   baseController: {fileID: 0}
   shootClip: {fileID: 0}
   overrideController: {fileID: 0}
