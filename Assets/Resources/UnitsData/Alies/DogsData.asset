@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: DogsData
   m_EditorClassIdentifier: 
   unitName: Dogs
-  spawnCost: 20
-  attackRange: 1
+  spawnCost: 0
+  attackRange: 1.2
   attackCooldown: 1
   accuracy: 1
   vulnerability: 0
@@ -51,6 +51,6 @@ MonoBehaviour:
   maxStock: 2
   rechargeCooldown: 10
   packCountPerLevel: 020000000300000004000000
-  biteSfx: {fileID: 8300000, guid: 3bbc34cd51efc554fbc0659ed87a85c0, type: 3}
+  biteSfx: {fileID: 0}
   biteVfx: {fileID: 8965377632537913298, guid: a7230d708df11f546a392f0b854bf826, type: 3}
   biteNudgeForce: 0

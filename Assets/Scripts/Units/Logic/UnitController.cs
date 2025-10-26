@@ -64,8 +64,10 @@ namespace Units.Logic
 
             var agent = GetComponent<NavMeshAgent>();
             var audioSource = GetComponent<AudioSource>();
-            var animator = GetComponentInChildren<Animator>();
-
+            var animators = GetComponentsInChildren<Animator>(true);
+            var animator = System.Array.Find(animators, a => a != null && a.enabled && a.gameObject.activeInHierarchy)
+                           ?? (animators.Length > 0 ? animators[0] : null);
+            
             _ctx = new UnitContext
             {
                 UnitData = unitData,

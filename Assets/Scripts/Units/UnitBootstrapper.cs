@@ -321,7 +321,10 @@ public class UnitBootstrapper : MonoBehaviour
 
 	private void ApplyAnimatorFrom(UnitArchetype archetype)
 	{
-		var animator = GetComponentInChildren<Animator>();
+		var animators = GetComponentsInChildren<Animator>(true);
+		var animator = System.Array.Find(animators, a => a != null && a.enabled && a.gameObject.activeInHierarchy)
+		               ?? (animators.Length > 0 ? animators[0] : null);
+
 		if (!animator) return;
 
 		// Prefer override if assigned; otherwise use base; if both null — keep current.
