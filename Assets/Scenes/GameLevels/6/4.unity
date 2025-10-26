@@ -8677,7 +8677,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   armyEconomy: {fileID: 156791509}
-  modularPrefab: {fileID: 8852521926508749481, guid: b682f78a51fdc7745afa72f589aebfb2, type: 3}
+  modularPrefab: {fileID: 7576861924283646321, guid: b682f78a51fdc7745afa72f589aebfb2, type: 3}
   creditsText: {fileID: 1513269051}
   pointsText: {fileID: 376743395}
   levelText: {fileID: 498064402}
@@ -12832,7 +12832,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eb4808d7a7343b0bb9e4802baa0bc8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modularPrefab: {fileID: 8852521926508749481, guid: b682f78a51fdc7745afa72f589aebfb2, type: 3}
+  modularPrefab: {fileID: 7576861924283646321, guid: b682f78a51fdc7745afa72f589aebfb2, type: 3}
   unitsRoot: {fileID: 1360163590}
   spawnAreas:
   - {fileID: 489982653}
@@ -19721,7 +19721,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eb4808d7a7343b0bb9e4802baa0bc8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modularPrefab: {fileID: 8852521926508749481, guid: b682f78a51fdc7745afa72f589aebfb2, type: 3}
+  modularPrefab: {fileID: 7576861924283646321, guid: b682f78a51fdc7745afa72f589aebfb2, type: 3}
   unitsRoot: {fileID: 2133741187}
   spawnAreas:
   - {fileID: 1585361994}

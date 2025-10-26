@@ -60,8 +60,8 @@ public class UnitBootstrapper : MonoBehaviour
 		_logic = AttachLogicComponent(archetype.logicKind);
 		if (_logic == null) return null;
 
-        if (archetype.shootClip != null)
-            _logic.shootClip = archetype.shootClip;
+		if (archetype.shootClip != null)
+			_logic.shootClip = archetype.shootClip;
 
 		// 4) Data
 		AssignUnitData(_logic, archetype.unitData);
@@ -69,7 +69,7 @@ public class UnitBootstrapper : MonoBehaviour
 		// 5) VFX / sockets
 		AutoWireVFX(_logic, archetype.logicKind);
 
-        _logic.coverSearchRadius = 6f;
+		_logic.coverSearchRadius = 6f;
 		_logic.coverSeekDistance = 10f;
 		_logic.coverExcludeAngleDeg = 100f;
 
@@ -102,6 +102,9 @@ public class UnitBootstrapper : MonoBehaviour
 			case UnitArchetype.LogicKind.Rocket:
 				logic = GetComponent<RocketLogic>() ?? gameObject.AddComponent<RocketLogic>();
 				break;
+			case UnitArchetype.LogicKind.Shield:
+				logic = GetComponent<ShieldLogic>() ?? gameObject.AddComponent<ShieldLogic>();
+				break;
 		}
 
 		if (logic) logic.enabled = true;
@@ -118,6 +121,8 @@ public class UnitBootstrapper : MonoBehaviour
 		if (a) a.enabled = false;
 		var r = GetComponent<RocketLogic>();
 		if (r) r.enabled = false;
+		var sh = GetComponent<ShieldLogic>();
+		if (sh) sh.enabled = false;
 	}
 
 	private static void AssignUnitData(UnitController ctrl, UnitData data)
@@ -129,6 +134,7 @@ public class UnitBootstrapper : MonoBehaviour
 	}
 
 	// Finds firePoint / muzzle sockets
+	// Finds firePoint / muzzle sockets
 	private void AutoWireWeaponPoints()
 	{
 		if (!bonesRoot)
@@ -137,57 +143,64 @@ public class UnitBootstrapper : MonoBehaviour
 			return;
 		}
 
-		// 1) animated bone that follows hand
-		Transform muzzleBone = FindBoneByName(bonesRoot, muzzleBoneName);
-		if (!muzzleBone)
+		Transform muzzleBone = FindBoneByName(bonesRoot, muzzleBoneName) ?? bonesRoot;
+
+		// Ищем существующие плейсхолдеры (точные имена приоритетнее)
+		Transform firePl = FindBoneByName(bonesRoot, "firePoint")
+		                   ?? FindFirstTransformByNames(bonesRoot, "firePoint", "fire");
+		Transform flashPl = FindBoneByName(bonesRoot, "muzzleFlashInstance")
+		                    ?? FindFirstTransformByNames(bonesRoot, "muzzleFlashInstance", "flash", "muzzle");
+		Transform smokePl = FindBoneByName(bonesRoot, "muzzleSmokeInstance")
+		                    ?? FindFirstTransformByNames(bonesRoot, "muzzleSmokeInstance", "smoke");
+
+		// *** ВАЖНО: если плейсхолдер найден — используем его, НИЧЕГО не создаём ***
+		if (firePl) firePoint = firePl;
+		if (flashPl) muzzleFlashInstance = flashPl.gameObject;
+		if (smokePl) muzzleSmokeInstance = smokePl.gameObject;
+
+		// Если каких-то узлов реально нет в префабе — только тогда создаём лёгкие сокеты
+		if (!firePoint)
 		{
-			Debug.LogWarning($"Muzzle bone '{muzzleBoneName}' not found under bonesRoot.", this);
-			return;
+			firePoint = new GameObject("firePoint").transform;
+			firePoint.SetParent(muzzleBone, false);
 		}
 
-		// 2) placeholders are placed under bones (not under weapon variant)
-		// try exact names first
-		Transform firePlExact = FindBoneByName(bonesRoot, "firePoint");
-		Transform flashPlExact = FindBoneByName(bonesRoot, "muzzleFlashInstance");
-		Transform smokePlExact = FindBoneByName(bonesRoot, "muzzleSmokeInstance");
-
-		// fallback: loose search by tokens
-		Transform firePl = firePlExact ? firePlExact : FindFirstTransformByNames(bonesRoot, "firePoint", "fire");
-		Transform flashPl = flashPlExact
-			? flashPlExact
-			: FindFirstTransformByNames(bonesRoot, "muzzleFlashInstance", "flash", "muzzle");
-		Transform smokePl = smokePlExact
-			? smokePlExact
-			: FindFirstTransformByNames(bonesRoot, "muzzleSmokeInstance", "smoke");
-
-		// 3) ensure runtime sockets exist (create lightweight ones if missing)
-		if (!firePoint) firePoint = new GameObject("firePoint").transform;
-		if (!muzzleFlashInstance) muzzleFlashInstance = new GameObject("muzzleFlashInstance");
-		if (!muzzleSmokeInstance) muzzleSmokeInstance = new GameObject("muzzleSmokeInstance");
-
-		// parent under animated bone so they follow animation
-		firePoint.SetParent(muzzleBone, false);
-		muzzleFlashInstance.transform.SetParent(muzzleBone, false);
-		muzzleSmokeInstance.transform.SetParent(muzzleBone, false);
-
-		// 4) copy offsets from placeholders (world → local to muzzleBone)
-		if (firePl)
+		if (!muzzleFlashInstance)
 		{
-			firePoint.localPosition = muzzleBone.InverseTransformPoint(firePl.position);
-			firePoint.localRotation = Quaternion.Inverse(muzzleBone.rotation) * firePl.rotation;
+			muzzleFlashInstance = new GameObject("muzzleFlashInstance");
+			muzzleFlashInstance.transform.SetParent(muzzleBone, false);
 		}
 
-		if (flashPl)
+		if (!muzzleSmokeInstance)
 		{
-			muzzleFlashInstance.transform.localPosition = muzzleBone.InverseTransformPoint(flashPl.position);
-			muzzleFlashInstance.transform.localRotation = Quaternion.Inverse(muzzleBone.rotation) * flashPl.rotation;
+			muzzleSmokeInstance = new GameObject("muzzleSmokeInstance");
+			muzzleSmokeInstance.transform.SetParent(muzzleBone, false);
 		}
 
-		if (smokePl)
+		// Если плейсхолдер был не под muzzleBone, переносим с сохранением world-позы
+		if (firePl && firePl.parent != muzzleBone)
 		{
-			muzzleSmokeInstance.transform.localPosition = muzzleBone.InverseTransformPoint(smokePl.position);
-			muzzleSmokeInstance.transform.localRotation = Quaternion.Inverse(muzzleBone.rotation) * smokePl.rotation;
+			firePoint.SetPositionAndRotation(firePl.position, firePl.rotation);
+			firePoint.SetParent(muzzleBone, true);
 		}
+
+		if (flashPl && flashPl.parent != muzzleBone)
+		{
+			muzzleFlashInstance.transform.SetPositionAndRotation(flashPl.position, flashPl.rotation);
+			muzzleFlashInstance.transform.SetParent(muzzleBone, true);
+		}
+
+		if (smokePl && smokePl.parent != muzzleBone)
+		{
+			muzzleSmokeInstance.transform.SetPositionAndRotation(smokePl.position, smokePl.rotation);
+			muzzleSmokeInstance.transform.SetParent(muzzleBone, true);
+		}
+
+#if UNITY_EDITOR
+		Debug.Log(
+			$"[UnitBootstrapper] Wired sockets: fire={firePoint?.name}, flash={muzzleFlashInstance?.name}, smoke={muzzleSmokeInstance?.name}",
+			this);
+#endif
 	}
 
 	private void AutoWireVFX(UnitController ctrl, UnitArchetype.LogicKind kind)
@@ -198,8 +211,9 @@ public class UnitBootstrapper : MonoBehaviour
 		var goProjectile = FindGO("vfxProjectile") ?? defaultProjectilePrefab;
 		var goHitEnemy = FindGO("vfxImpactUnit") ?? vfxImpactUnit;
 		var goHitEnv = FindGO("vfxImpactObjects") ?? vfxImpactObjects;
-		var goMuzzleFlash = FindGO("muzzleFlashInstance") ?? vfxMuzzleFlash;
-		var goMuzzleSmoke = FindGO("muzzleSmokeInstance") ?? vfxMuzzleSmoke;
+
+		var goMuzzleFlash = this.muzzleFlashInstance ?? FindGO("muzzleFlashInstance") ?? vfxMuzzleFlash;
+		var goMuzzleSmoke = this.muzzleSmokeInstance ?? FindGO("muzzleSmokeInstance") ?? vfxMuzzleSmoke;
 		var goSpawn = FindGO("vfxSpawn") ?? vfxSpawn;
 
 		// --- Rocket overrides ---
