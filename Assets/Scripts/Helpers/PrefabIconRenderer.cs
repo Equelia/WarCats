@@ -218,4 +218,29 @@ public class PrefabIconRenderer : MonoBehaviour
         int iz = (id >> 6) & 63;
         return RigBase + new Vector3(ix * RigStep, 0f, iz * RigStep);
     }
+    
+    // PrefabIconRenderer.cs
+    public void RenderMine(GameObject minePrefab)
+    {
+        if (!minePrefab)
+        {
+            Debug.LogWarning("RenderMine: minePrefab is null");
+            return;
+        }
+
+        if (!_iconCam) BuildRig();
+        if (target) target.enabled = true;
+
+        if (_instance) DestroyImmediate(_instance);
+
+        _instance = Instantiate(minePrefab, _rigRoot.transform);
+        _instance.transform.localPosition = Vector3.zero;
+        _instance.transform.localRotation = Quaternion.Euler(modelEuler);
+        _instance.transform.localScale = Vector3.one * modelScale;
+
+        SetLayerRecursively(_instance, _iconLayer);
+
+        var bounds = ComputeRenderersBounds(_instance);
+        FrameBounds(bounds);
+    }
 }

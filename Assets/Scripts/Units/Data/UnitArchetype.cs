@@ -14,7 +14,7 @@ public class UnitArchetype : ScriptableObject
 
 	[Header("Logic")]
 	public LogicKind logicKind;
-	public enum LogicKind { Pistol, Automata, Sniper, Rocket, Shield, Dogs, CatGirl }
+	public enum LogicKind { Pistol, Automata, Sniper, Rocket, Shield, Dogs, Mine, CatGirl }
 
 	[Header("Data (stats/behaviour)")]
 	public UnitData unitData;

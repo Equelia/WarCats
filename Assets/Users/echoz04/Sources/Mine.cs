@@ -1,141 +1,97 @@
-using System;
-using System.Threading;
 using Cysharp.Threading.Tasks;
 using Units.Logic;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
+[DisallowMultipleComponent]
 public class Mine : MonoBehaviour
 {
-    [Header("Damage")]
-    [SerializeField] private int teamToDamage = 1;
-    [SerializeField] private int damage = 993;
-
-    [Header("FX")]
+    [SerializeField] private MineData data;           
     [SerializeField] private GameObject explosionEffect;
-    [SerializeField] private GameObject visuals;
-    [SerializeField] private bool effectIsChild = true;
-    [SerializeField, Range(0.1f, 10f)] private float fxTimeoutSeconds = 3f;
-
-    [Header("Audio")]
-    [SerializeField] private AudioClip explosionClip;
-    [SerializeField, Range(0f, 1f)] private float explosionVolume = 1f;
+    [SerializeField] private AudioClip explosionSound;
 
     private bool _armed = true;
-    private CancellationTokenSource _cts;
-    private AudioSource _audioSource;
+    private AudioSource _audio;
+
+    // кеш уровневых значений
+    private int _damage;
+    private float _radius;
+
+    // ВЛАДЕЛЕЦ МИНЫ (команда)
+    private int _ownerTeamId = 0;
+
+    public void Init(MineData d, int level, int ownerTeamId)
+    {
+        data = d;
+        _armed = true;
+
+        _ownerTeamId = ownerTeamId;
+
+        _damage = data.GetExplosionDamageForLevel(level);
+        _radius = data.GetExplosionRadiusForLevel(level);
+
+        explosionEffect = data.explosionEffect;
+        explosionSound  = data.explosionSound;
+    }
+
+    // Старую сигнатуру оставим на всякий случай (по умолчанию owner = 0)
+    public void Init(MineData d, int level) => Init(d, level, 0);
 
     private void Awake()
     {
-        _audioSource = GetComponent<AudioSource>();
-    }
-
-    private void OnEnable()
-    {
-        _armed = true;
-        _cts = new CancellationTokenSource();
-        if (effectIsChild && explosionEffect != null)
-            explosionEffect.SetActive(false);
-    }
-
-    private void OnDisable()
-    {
-        _armed = false;
-        _cts?.Cancel();
-        _cts?.Dispose();
-        _cts = null;
+        _audio = GetComponent<AudioSource>();
+        _audio.playOnAwake = false;
+        _audio.spatialBlend = 1f;
     }
 
     private void OnCollisionEnter(Collision other)
     {
-        HandleHitAsync(other).Forget();
+        if (!_armed || data == null) return;
+
+        if (other.gameObject.TryGetComponent(out UnitController u))
+        {
+            // ВЗРЫВАЕМСЯ ТОЛЬКО НА ПРОТИВНИКАХ
+            if (u.TeamId != _ownerTeamId)
+                Explode().Forget();
+        }
     }
 
-    private async UniTaskVoid HandleHitAsync(Collision other)
+    private async UniTaskVoid Explode()
     {
-        if (!_armed) return;
-        if (!other.gameObject.TryGetComponent(out UnitController controller)) return;
-        if (controller.TeamId != teamToDamage) return;
-
         _armed = false;
 
-        try
+        // Урон по области — только по ПРОТИВНИКАМ
+        var hits = Physics.OverlapSphere(transform.position, _radius, ~0, QueryTriggerInteraction.Collide);
+        foreach (var h in hits)
+            if (h.TryGetComponent(out UnitController c) && c.TeamId != _ownerTeamId)
+                c.ReceiveDamage(_damage);
+
+        if (explosionEffect)
         {
-            controller.ReceiveDamage(damage);
-            await PlayExplosionFxAsync(_cts.Token);
-            Destroy(gameObject);
-            Debug.Log("Boom");
+            var fx = Instantiate(explosionEffect, transform.position, Quaternion.identity);
+            Destroy(fx, 3f);
         }
-        catch (OperationCanceledException)
+
+        float wait = 0.4f;
+        if (_audio && explosionSound)
         {
+            _audio.PlayOneShot(explosionSound);
+            wait = Mathf.Max(wait, explosionSound.length / Mathf.Max(0.01f, _audio.pitch));
         }
-        catch (Exception e)
-        {
-            Debug.LogException(e, this);
-            gameObject.SetActive(false);
-        }
+
+        await UniTask.Delay(System.TimeSpan.FromSeconds(wait));
+        Destroy(gameObject);
     }
 
-private async UniTask PlayExplosionFxAsync(CancellationToken token)
-{
-    UniTask sfxTask = UniTask.CompletedTask;
-    if (_audioSource != null && explosionClip != null)
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
     {
-        _audioSource.PlayOneShot(explosionClip, explosionVolume);
-        var seconds = explosionClip.length / Mathf.Max(0.01f, _audioSource.pitch);
-        sfxTask = UniTask.Delay(TimeSpan.FromSeconds(seconds), cancellationToken: token);
-    }
-
-    UniTask vfxTask;
-    if (explosionEffect == null)
-    {
-        vfxTask = UniTask.Yield(PlayerLoopTiming.Update, token);
-    }
-    else if (effectIsChild)
-    {
-        explosionEffect.transform.SetPositionAndRotation(transform.position, transform.rotation);
-        explosionEffect.SetActive(true);
-        visuals.SetActive(false);
-
-        if (explosionEffect.TryGetComponent(out ParticleSystem ps))
+        float r = (_radius > 0f) ? _radius : (data ? data.explosionRadius : 0f);
+        if (r > 0f)
         {
-            vfxTask = UniTask.WhenAny(
-                UniTask.WaitUntil(() => !ps.IsAlive(true), cancellationToken: token),
-                UniTask.Delay(TimeSpan.FromSeconds(fxTimeoutSeconds), cancellationToken: token)
-            ).AsUniTask();
-        }
-        else
-        {
-            vfxTask = UniTask.Delay(TimeSpan.FromSeconds(0.25f), cancellationToken: token);
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, r);
         }
     }
-    else
-    {
-        var fx = Instantiate(explosionEffect, transform.position, transform.rotation);
-        vfxTask = UniTask.Create(async () =>
-        {
-            try
-            {
-                if (fx.TryGetComponent(out ParticleSystem ps))
-                {
-                    ps.Play(true);
-                    await UniTask.WhenAny(
-                        UniTask.WaitUntil(() => !ps.IsAlive(true), cancellationToken: token),
-                        UniTask.Delay(TimeSpan.FromSeconds(fxTimeoutSeconds), cancellationToken: token)
-                    );
-                }
-                else
-                {
-                    await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: token);
-                }
-            }
-            finally
-            {
-                if (fx != null) Destroy(fx);
-            }
-        });
-    }
-
-    await UniTask.WhenAll(sfxTask, vfxTask);
-}
+#endif
 }

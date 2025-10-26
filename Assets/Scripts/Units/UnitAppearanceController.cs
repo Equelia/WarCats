@@ -10,7 +10,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class UnitAppearanceToggle : MonoBehaviour
 {
-	public enum UnitKind { Pistol, Automata, Sniper, Rocket, Shield, Dog, CatGirl }
+	public enum UnitKind { Pistol, Automata, Sniper, Rocket, Shield, Dog, Mine, CatGirl }
 	public enum Team { Ally, Enemy }
 
 	[Header("Variant Roots (parents that contain child variants)")]

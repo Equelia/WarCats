@@ -14,10 +14,9 @@ public class UnitSummonController : MonoBehaviour
 	[SerializeField] private Button upgradeButton;
 	[SerializeField] private TMP_Text levelText;
 	[SerializeField] private int maxLevel = 3;
-	
+
 	public int teamId = 0;
 	public int levelOverride = 0;
-
 
 
 	[Header("Spawn config")] public Transform spawnPoint;
@@ -127,8 +126,8 @@ public class UnitSummonController : MonoBehaviour
 
 		_configured = true;
 		RaiseStock();
-		
-		if(upgradeButton != null)
+
+		if (upgradeButton != null)
 		{
 			upgradeButton.onClick.AddListener(HandleUpgradeBtnClick);
 			ChangeLevelText();
@@ -137,7 +136,7 @@ public class UnitSummonController : MonoBehaviour
 
 	private void HandleUpgradeBtnClick()
 	{
-		if(slotLevel < maxLevel && _army.TrySpendPoints(1))
+		if (slotLevel < maxLevel && _army.TrySpendPoints(1))
 		{
 			slotLevel++;
 			ChangeLevelText();
@@ -157,6 +156,51 @@ public class UnitSummonController : MonoBehaviour
 	/// <summary>Try to summon one unit or a squad. Handles slots, credits, stock, pose, spawn.</summary>
 	public bool TrySummon()
 	{
+		if (_archetype.unitData is MineData mineData)
+		{
+			int levelToUse = Mathf.Max(1, levelOverride > 0 ? levelOverride : _army.State.level);
+			if (teamId == 0) levelToUse = slotLevel;
+
+			if (teamId == 0)
+			{
+				var placer = FindObjectOfType<MinePlacementController>(true);
+				if (placer != null)
+				{
+					placer.StartPlacement(mineData, levelToUse, _army, this);
+					return true;
+				}
+
+				return false;
+			}
+
+			var reg = MineSpotsRegistry.Instance;
+			if (reg == null) return false;
+
+			reg.RefreshAll();
+
+			var enemyBase = (_baseProvider != null) ? _baseProvider.GetOpposingBaseTransform(teamId) : null;
+			var spot = reg.GetBestFreeSpotForTeam(teamId, enemyBase);
+			if (spot == null) return false;
+
+			int mineCost = _unitData.GetStatsForLevel(levelToUse).spawnCost;
+
+			if (!_army.TrySpendCredits(mineCost)) return false;
+
+			var go = Instantiate(mineData.minePrefab, spot.transform.position, spot.transform.rotation);
+			var mine = go.GetComponent<Mine>() ?? go.AddComponent<Mine>();
+			mine.Init(mineData, levelToUse, teamId);
+			
+			var anchor = go.GetComponent<MineSpotAnchor>() ?? go.AddComponent<MineSpotAnchor>();
+			anchor.Bind(spot);
+
+			OnMinePlacedSuccessfully();
+
+			spot.RefreshOccupation();
+			reg.RefreshAll();
+
+			return true;
+		}
+
 		if (!CanSummon) return false;
 
 		if (!_army.TryReserveSlot()) return false;
@@ -187,13 +231,13 @@ public class UnitSummonController : MonoBehaviour
 			return false;
 		}
 
-		int levelToUse = Mathf.Max(1, levelOverride > 0 ? levelOverride : _army.State.level); 
+		int levelToUse2 = Mathf.Max(1, levelOverride > 0 ? levelOverride : _army.State.level);
 		if (teamId == 0)
-			levelToUse = slotLevel;
-		
-		int count = Mathf.Max(1, _unitData.GetSpawnCountForLevel(levelToUse));
+			levelToUse2 = slotLevel;
 
-		var enemyBase = (_baseProvider != null) ? _baseProvider.GetOpposingBaseTransform(teamId) : null;
+		int count = Mathf.Max(1, _unitData.GetSpawnCountForLevel(levelToUse2));
+
+		var enemyBase2 = (_baseProvider != null) ? _baseProvider.GetOpposingBaseTransform(teamId) : null;
 
 		var members = new UnitController[count];
 		const float spread = 0.6f;
@@ -202,9 +246,9 @@ public class UnitSummonController : MonoBehaviour
 		{
 			float ang = (count == 1) ? 0f : (Mathf.PI * 2f * i) / count;
 			Vector3 offset = new Vector3(Mathf.Cos(ang), 0f, Mathf.Sin(ang)) * spread;
-			
-			members[i] = _spawner.Spawn(_archetype, teamId, levelToUse, // УРОВЕНРЬ ТУТА
-				pos + offset, rot, enemyBase);
+
+			members[i] = _spawner.Spawn(_archetype, teamId, levelToUse2,
+				pos + offset, rot, enemyBase2);
 
 			if (!members[i])
 			{
@@ -243,6 +287,18 @@ public class UnitSummonController : MonoBehaviour
 			StartRefillToMaxIfNeeded().Forget();
 
 		return true;
+	}
+
+// Публичный хук — вызываем после успешной установки мины (и игроком, и ИИ)
+	public void OnMinePlacedSuccessfully()
+	{
+		if (!HasStockLimit) return;
+
+		StockCurrent = Mathf.Max(0, StockCurrent - 1);
+		RaiseStock();
+
+		if (StockMode == Units.Data.UnitData.StockMode.LimitedWithRecharge && StockCurrent == 0)
+			StartRefillToMaxIfNeeded().Forget();
 	}
 
 

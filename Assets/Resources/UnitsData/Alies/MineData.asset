@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c05d07b3504508ab3fd12232f25cff, type: 3}
+  m_Name: MineData
+  m_EditorClassIdentifier: 
+  unitName: Mine
+  spawnCost: 20
+  attackRange: 0
+  attackCooldown: 0
+  accuracy: 0
+  vulnerability: 0
+  damage: 0
+  maxHealth: 0
+  moveSpeed: 0
+  levelModifiers: []
+  stockMode: 0
+  startingStock: 0
+  maxStock: 0
+  rechargeCooldown: 10
+  explosionRadius: 3
+  explosionDamage: 100
+  minePrefab: {fileID: 3750614960173781411, guid: bd97c087ada4f884cb0a4d988a5af5c4, type: 3}
+  explosionEffect: {fileID: 2648822557472679254, guid: 8cac8fae1ee5a874b9cb252af9c39359, type: 3}
+  explosionSound: {fileID: 8300000, guid: 6531bbb1311d6684aa0048356e317975, type: 3}
+  mineLevelModifiers:
+  - level: 1
+    damageAdd: 0
+    radiusMul: 1
+  - level: 2
+    damageAdd: 100
+    radiusMul: 1.1
+  - level: 3
+    damageAdd: 100
+    radiusMul: 1.2

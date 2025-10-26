@@ -146,7 +146,15 @@ public class ArmyUIController : MonoBehaviour
             if (iconRenderer)
             {
                 iconRenderer.gameObject.SetActive(true);
-                iconRenderer.RenderModularArchetype(modularPrefab, archetype, teamId: 0);
+
+                if (archetype.unitData is MineData mineData && mineData.minePrefab)
+                {
+                    iconRenderer.RenderMine(mineData.minePrefab); 
+                }
+                else
+                {
+                    iconRenderer.RenderModularArchetype(modularPrefab, archetype, teamId: 0);
+                }
             }
 
             btn.BindToController(controller);
