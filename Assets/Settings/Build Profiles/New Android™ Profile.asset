@@ -20,22 +20,8 @@ MonoBehaviour:
     rid: 4492739090161074256
   m_OverrideGlobalSceneList: 1
   m_Scenes:
-  - m_enabled: 0
-    m_path: Assets/Scenes/SampleScene.unity
   - m_enabled: 1
     m_path: Assets/Scenes/Lobby.unity
-  - m_enabled: 1
-    m_path: Assets/Scenes/GameLevels/1/TownLevel.unity
-  - m_enabled: 1
-    m_path: Assets/Scenes/GameLevels/2/TownLevel.unity
-  - m_enabled: 1
-    m_path: Assets/Scenes/GameLevels/3/IslandLevel2.unity
-  - m_enabled: 1
-    m_path: Assets/Scenes/GameLevels/4/IslandLevel2.unity
-  - m_enabled: 1
-    m_path: Assets/Scenes/GameLevels/5/4.unity
-  - m_enabled: 1
-    m_path: Assets/Scenes/GameLevels/6/4.unity
   m_ScriptingDefines:
   - 
   m_PlayerSettingsYaml:

@@ -17,9 +17,9 @@ MonoBehaviour:
   attackRange: 6
   attackCooldown: 1.5
   accuracy: 0.2
-  vulnerability: 0.5
+  vulnerability: 0.482
   damage: 6
-  maxHealth: 60
+  maxHealth: 80
   moveSpeed: 1
   levelModifiers:
   - level: 1

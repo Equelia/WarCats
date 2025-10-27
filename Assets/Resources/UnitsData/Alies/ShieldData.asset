@@ -17,10 +17,10 @@ MonoBehaviour:
   attackRange: 6
   attackCooldown: 1.5
   accuracy: 0.2
-  vulnerability: 0.7
+  vulnerability: 0.493
   damage: 7
   maxHealth: 80
-  moveSpeed: 1
+  moveSpeed: 0.9
   levelModifiers:
   - level: 1
     attackRangeMultiplier: 0
@@ -34,17 +34,17 @@ MonoBehaviour:
     attackRangeMultiplier: 0
     attackCooldownMultiplier: 0
     accuracyAdd: 0
-    damageAdd: 0
+    damageAdd: 2
     healthAdd: 10
-    moveSpeedMultiplier: 0
+    moveSpeedMultiplier: 1.1
     vulnerabilityAdd: 0
   - level: 3
     attackRangeMultiplier: 0
     attackCooldownMultiplier: 0
     accuracyAdd: 0
-    damageAdd: 0
+    damageAdd: 2
     healthAdd: 10
-    moveSpeedMultiplier: 0
+    moveSpeedMultiplier: 1.2
     vulnerabilityAdd: 0.1
   stockMode: 0
   startingStock: 0

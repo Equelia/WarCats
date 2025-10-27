@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: EnemyDogsData
   m_EditorClassIdentifier: 
   unitName: Dogs
-  spawnCost: 5
+  spawnCost: 45
   attackRange: 1
-  attackCooldown: 1
+  attackCooldown: 0.5
   accuracy: 1
-  vulnerability: 0
-  damage: 1
-  maxHealth: 15
+  vulnerability: 0.184
+  damage: 6
+  maxHealth: 20
   moveSpeed: 2.5
   levelModifiers:
   - level: 1

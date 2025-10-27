@@ -9,26 +9,23 @@ EditorBuildSettings:
     path: Assets/Scenes/Lobby.unity
     guid: 3b3721d125206a340b3571056f11c4ae
   - enabled: 1
-    path: Assets/Scenes/GameLevels/1/TownLevel.unity
-    guid: c9b688814126321429bdc88a09161307
-  - enabled: 1
-    path: Assets/Scenes/GameLevels/2/TownLevel.unity
-    guid: 228bce9b834e78a4fad90ee3a53c49b8
-  - enabled: 1
-    path: Assets/Scenes/GameLevels/3/IslandLevel2.unity
-    guid: ceec47d0eed27fe42a3585189178b4ed
-  - enabled: 1
-    path: Assets/Scenes/GameLevels/4/IslandLevel2.unity
+    path: Assets/Scenes/GameLevels/2/2.unity
     guid: 79d9a6fa1222ccb4eb2d4cca6039305d
   - enabled: 1
-    path: Assets/Scenes/GameLevels/5/4.unity
+    path: Assets/Scenes/GameLevels/3/3.unity
     guid: fdd4c74c88f5d9c4ba58053f96aa19bc
   - enabled: 1
-    path: Assets/Scenes/GameLevels/6/4.unity
+    path: Assets/Scenes/GameLevels/4/4.unity
     guid: ccf249c9b3d5d3f43baefa89cff0c3c9
   - enabled: 1
-    path: Assets/Scenes/GameLevels/7/5.unity
+    path: Assets/Scenes/GameLevels/5/5.unity
     guid: f62071a68064e074f8f134520a21a683
+  - enabled: 1
+    path: Assets/Scenes/GameLevels/6/6.unity
+    guid: c9b688814126321429bdc88a09161307
+  - enabled: 1
+    path: Assets/Scenes/GameLevels/7/7.unity
+    guid: 8904fe5532e8fa14c9e34ce3d9dd7bf0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

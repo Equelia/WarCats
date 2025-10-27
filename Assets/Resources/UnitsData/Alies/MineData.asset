@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MineData
   m_EditorClassIdentifier: 
   unitName: Mine
-  spawnCost: 20
+  spawnCost: 25
   attackRange: 0
   attackCooldown: 0
   accuracy: 0
@@ -22,11 +22,11 @@ MonoBehaviour:
   maxHealth: 0
   moveSpeed: 0
   levelModifiers: []
-  stockMode: 0
-  startingStock: 0
-  maxStock: 0
-  rechargeCooldown: 10
-  explosionRadius: 3
+  stockMode: 2
+  startingStock: 1
+  maxStock: 2
+  rechargeCooldown: 30
+  explosionRadius: 2
   explosionDamage: 100
   minePrefab: {fileID: 3750614960173781411, guid: bd97c087ada4f884cb0a4d988a5af5c4, type: 3}
   explosionEffect: {fileID: 2648822557472679254, guid: 8cac8fae1ee5a874b9cb252af9c39359, type: 3}

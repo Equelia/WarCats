@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Rocketeer
   spawnCost: 65
-  attackRange: 14
+  attackRange: 10
   attackCooldown: 8
   accuracy: 1
   vulnerability: 0.1
@@ -31,7 +31,7 @@ MonoBehaviour:
     moveSpeedMultiplier: 1
     vulnerabilityAdd: 0
   - level: 2
-    attackRangeMultiplier: 1
+    attackRangeMultiplier: 1.1
     attackCooldownMultiplier: 1
     accuracyAdd: 0
     damageAdd: 0
@@ -39,7 +39,7 @@ MonoBehaviour:
     moveSpeedMultiplier: 1.25
     vulnerabilityAdd: 0
   - level: 3
-    attackRangeMultiplier: 1
+    attackRangeMultiplier: 1.2
     attackCooldownMultiplier: 0.8
     accuracyAdd: 0
     damageAdd: 0
@@ -50,6 +50,6 @@ MonoBehaviour:
   startingStock: 0
   maxStock: 1
   rechargeCooldown: 10
-  splashRadius: 1.5
+  splashRadius: 2.5
   rocketSpeed: 15
   spawnCountPerSlot: 010000000100000002000000
