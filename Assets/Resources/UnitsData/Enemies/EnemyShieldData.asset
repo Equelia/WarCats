@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnemyShieldData
   m_EditorClassIdentifier: 
   unitName: Shield
-  spawnCost: 60
+  spawnCost: 65
   attackRange: 6
   attackCooldown: 1.5
   accuracy: 0.2
